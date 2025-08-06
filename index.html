@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Domana – Coming Soon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #111827;
+      --accent: #f59e0b;
+      --text: #f9fafb;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .container {
+      text-align: center;
+      max-width: 600px;
+    }
+    .logo {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+    }
+    .tagline {
+      font-size: 1.125rem;
+      font-weight: 400;
+      margin-bottom: 2rem;
+    }
+    .cta {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    form {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    input[type=email] {
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 0.375rem;
+      flex: 1;
+      max-width: 300px;
+    }
+    button {
+      padding: 0.75rem 1.25rem;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 0.375rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    footer {
+      margin-top: 2rem;
+      font-size: 0.875rem;
+      opacity: 0.7;
+    }
+    .file-structure {
+      text-align: left;
+      margin-top: 2rem;
+      font-size: 0.875rem;
+      background: rgba(255,255,255,0.05);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      line-height: 1.6;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">Domana</div>
+    <p class="tagline">A smarter way to explore real estate across Southeast Asia</p>
+    <p class="cta">Get notified when we launch</p>
+    <form action="https://example.com/subscribe" method="post">
+      <input type="email" name="email" placeholder="your email address" required>
+      <button type="submit">Notify Me</button>
+    </form>
+    <div class="file-structure">
+      <strong>domana.app/</strong><br>
+      ├── index.html  # Main coming soon page<br>
+      └── README.md  # Project overview and setup instructions
+    </div>
+    <footer>© 2025 Domana. All rights reserved.</footer>
+  </div>
+</body>
+</html>
