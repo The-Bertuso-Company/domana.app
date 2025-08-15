@@ -20,16 +20,16 @@ Our mission is to make buying, selling, and exploring property easy, transparent
 ---
 
 ## ✅ Core Jobs-to-Be-Done (MVP)
-1) Search for property with essential filters  
-2) View verified listing details and photos  
-3) Contact the seller or agent
+1. Search for property with essential filters  
+2. View verified listing details and photos  
+3. Contact the seller or agent
 
 ---
 
 ## 🖥️ MVP Screens
-1) **Home / Search**  
-2) **Listing Details**  
-3) **Contact Seller/Agent**
+1. **Home / Search**  
+2. **Listing Details**  
+3. **Contact Seller/Agent**
 
 ---
 
