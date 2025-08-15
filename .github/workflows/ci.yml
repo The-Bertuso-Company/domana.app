@@ -3,25 +3,32 @@ name: CI
 on:
   push:
     branches: [ main, master ]
-    paths:
-      - 'frontend/**'
-      - '.github/**'
+    paths: [ 'frontend/**', '.github/**' ]
   pull_request:
     branches: [ main, master ]
-    paths:
-      - 'frontend/**'
-      - '.github/**'
+    paths: [ 'frontend/**', '.github/**' ]
 
 jobs:
   build-and-lint:
     runs-on: ubuntu-latest
 
+    # Run all commands from the frontend folder
     defaults:
       run:
         working-directory: frontend
 
     env:
       NEXT_TELEMETRY_DISABLED: 1
+
+      # --- Sentry sourcemap upload config ---
+      # Secret + vars you added in GitHub → Settings → Secrets and variables → Actions
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+      SENTRY_ENVIRONMENT: ${{ vars.SENTRY_ENVIRONMENT || 'production' }}
+      # Tie the release to this commit for clean grouping in Sentry
+      SENTRY_RELEASE: ${{ github.sha }}
+      # --------------------------------------
 
     steps:
       - name: Checkout
@@ -45,8 +52,20 @@ jobs:
       - name: Lint
         run: npm run lint --if-present
 
-      - name: Run tests
+      - name: Test
         run: npm test --if-present
 
-      - name: Build
+      # During this build, @sentry/nextjs detects the env above and uploads sourcemaps
+      - name: Build (uploads sourcemaps)
         run: npm run build
+
+      # Optional but nice: create/finalize a release and link commits.
+      # Some Sentry plans expose "Release: Admin" only; if you don't have it,
+      # this step will be skipped without failing the build.
+      - name: Sentry release finalize (optional)
+        if: ${{ env.SENTRY_AUTH_TOKEN != '' }}
+        continue-on-error: true
+        run: |
+          npx sentry-cli releases new "$SENTRY_RELEASE"
+          npx sentry-cli releases set-commits "$SENTRY_RELEASE" --auto
+          npx sentry-cli releases finalize "$SENTRY_RELEASE"
