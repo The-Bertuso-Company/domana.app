@@ -1,8 +1,40 @@
-﻿node_modules
+﻿# Dependencies
+node_modules/
+
+# Environment variables (never commit secrets)
 .env
 .env.*
+!.env.example  # keep a template for local dev
+
+# OS / editor junk
 .DS_Store
-# build outputs
-dist
-.next
-coverage
+Thumbs.db
+
+# Build outputs
+dist/
+.next/
+out/            # Next.js static export (if used)
+coverage/       # test coverage
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Vercel deployment
+.vercel/
+
+# Local tooling / IDE
+.vscode/
+*.swp
+# build + deps
+.next/
+frontend/.next/
+node_modules/
+frontend/node_modules/
+
+# backups & archives
+backups/
+frontend/backups/
+*.zip
