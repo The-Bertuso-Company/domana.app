@@ -88,7 +88,7 @@ DATABASE_URL=postgres://user:pass@localhost:5432/domanadb
 JWT_SECRET=change_me
 
     If backend is not ready yet, stub API responses in the frontend using mock data or a simple /api route in Next.js.
-
+```
 🧪 Testing
 
     Unit tests: pnpm test
