@@ -1,5 +1,5 @@
 "use client";
-import DomanaMap from "./DomanaMap";
+import DomanaMap from "@/components/Map";
 
 type Listing = {
   id: number;
