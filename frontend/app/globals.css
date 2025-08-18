@@ -270,3 +270,46 @@ header {
   .results-pane { height: auto; }
   .results-grid { grid-template-columns: 1fr; }
 }
+
+.listings-grid {
+  display: grid;
+  grid-template-columns: 60% 40%;
+  height: 100vh; /* full page height */
+}
+
+.map-pane {
+  width: 100%;
+  height: 100%;
+}
+
+.results-pane {
+  padding: 16px;
+  overflow-y: auto;
+  background: #fafafa;
+  border-left: 1px solid #ddd;
+}
+
+.results-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.results-grid {
+  display: grid;
+  gap: 16px;
+}
+.listings-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr; /* 60% map / 40% listings */
+  height: 100vh;
+}
+
+.map-pane {
+  border-right: 1px solid #eee;
+}
+
+.results-pane {
+  padding: 1rem;
+  overflow-y: auto;
+}

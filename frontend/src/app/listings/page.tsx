@@ -1,8 +1,10 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
-import DomanaMap from "../../src/components/Map";
+import DomanaMap from "@/components/Map";
+import styles from "./page.module.css"; // ✅ scoped CSS for this page
 
+// Temporary demo data until DB or API is ready
 const placeholderListings = [
   {
     id: 1,
@@ -63,10 +65,10 @@ const placeholderListings = [
 
 export default function ListingsPage() {
   return (
-    <section className="full-bleed">
-      <div className="listings-grid">
-        {/* Map (60%) */}
-        <div className="map-pane">
+    <section className={styles.fullBleed}>
+      <div className={styles.listingsGrid}>
+        {/* Map (left, 60%) */}
+        <div className={styles.mapPane}>
           <DomanaMap
             markers={placeholderListings.map((l) => ({
               id: l.id,
@@ -77,12 +79,13 @@ export default function ListingsPage() {
           />
         </div>
 
-        {/* Listings (40%) */}
-        <aside className="results-pane">
-          <h2 className="results-title">Homes for Sale</h2>
-          <div className="results-grid">
+        {/* Listings (right, 40%) */}
+        <aside className={styles.resultsPane}>
+          <h2 className={styles.resultsTitle}>Homes for Sale</h2>
+
+          <div className={styles.resultsGrid}>
             {placeholderListings.map((listing) => (
-              <div key={listing.id} className="card">
+              <div key={listing.id} className={styles.card}>
                 <Image
                   src={listing.image}
                   alt={`Listing in ${listing.location}`}
@@ -96,11 +99,11 @@ export default function ListingsPage() {
                     display: "block",
                   }}
                 />
-                <h3 style={{ fontWeight: 700 }}>{listing.price}</h3>
-                <p className="muted">
+                <h3 className={styles.cardPrice}>{listing.price}</h3>
+                <p className={styles.muted}>
                   {listing.beds} Beds • {listing.baths} Baths • {listing.size}
                 </p>
-                <p className="muted">{listing.location}</p>
+                <p className={styles.muted}>{listing.location}</p>
               </div>
             ))}
           </div>

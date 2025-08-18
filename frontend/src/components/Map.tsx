@@ -13,6 +13,13 @@ type MarkerData = {
   label?: string; // e.g., price
 };
 
+// Extend mapboxgl.Map to include our custom property
+declare module "mapbox-gl" {
+  interface Map {
+    __domanaMarkers?: mapboxgl.Marker[];
+  }
+}
+
 export default function DomanaMap({ markers = [] as MarkerData[] }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -38,11 +45,9 @@ export default function DomanaMap({ markers = [] as MarkerData[] }) {
   useEffect(() => {
     if (!mapRef.current) return;
 
-    // remove old markers stored on map instance (simple cleanup approach)
-    // @ts-expect-error
+    // cleanup old markers
     if (mapRef.current.__domanaMarkers) {
-      // @ts-expect-error
-      mapRef.current.__domanaMarkers.forEach((m: mapboxgl.Marker) => m.remove());
+      mapRef.current.__domanaMarkers.forEach((m) => m.remove());
     }
 
     const created: mapboxgl.Marker[] = markers.map((m) => {
@@ -63,7 +68,7 @@ export default function DomanaMap({ markers = [] as MarkerData[] }) {
         .addTo(mapRef.current!);
     });
 
-    // @ts-expect-error
+    // store new markers
     mapRef.current.__domanaMarkers = created;
   }, [markers]);
 

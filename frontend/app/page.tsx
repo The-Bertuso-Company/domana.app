@@ -1,7 +1,11 @@
-﻿import SearchBar from "../components/SearchBar";
-import Reveal from "../components/Reveal";
-import DomanaMap from "../components/Map";
+﻿import SearchBar from "../src/components/SearchBar";
+import Reveal from "../src/components/Reveal";
+import DomanaMap from "../src/components/DomanaMap";
 
+const placeholderListings = [
+  { id: 1, longitude: 121.05, latitude: 14.55, label: "₱2.5M" },
+  { id: 2, longitude: 123.89, latitude: 10.31, label: "₱4.2M" },
+];
 
 export default function Home() {
   return (
@@ -33,42 +37,33 @@ export default function Home() {
         <SearchBar />
       </Reveal>
 
-      {/* Features */}
+      {/* Map + Listings layout */}
       <section
         className="container"
         style={{
-          marginTop: 16,
+          marginTop: 24,
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gridTemplateColumns: "60% 40%",
           gap: 20,
+          minHeight: "500px",
         }}
       >
-        <Reveal delay={60}>
-          <div className="card" style={{ padding: 20 }}>
-            <h3 style={{ marginBottom: 10, fontWeight: 600 }}>Wide Property Selection</h3>
-            <p className="muted">
-              From city condos to beachfront villas, browse properties that match your lifestyle.
-            </p>
-          </div>
-        </Reveal>
+        {/* Map */}
+        <div style={{ borderRadius: 12, overflow: "hidden" }}>
+          <DomanaMap markers={placeholderListings} />
+        </div>
 
-        <Reveal delay={120}>
-          <div className="card" style={{ padding: 20 }}>
-            <h3 style={{ marginBottom: 10, fontWeight: 600 }}>User‑Friendly Search</h3>
-            <p className="muted">
-              Interactive maps and filters help you find the perfect place faster.
-            </p>
-          </div>
-        </Reveal>
-
-        <Reveal delay={180}>
-          <div className="card" style={{ padding: 20 }}>
-            <h3 style={{ marginBottom: 10, fontWeight: 600 }}>Trusted Connections</h3>
-            <p className="muted">
-              Connect with verified agents, sellers, and developers with confidence.
-            </p>
-          </div>
-        </Reveal>
+        {/* Placeholder listings */}
+        <div className="card" style={{ padding: 20 }}>
+          <h3 style={{ fontWeight: 600, marginBottom: 12 }}>Featured Listings</h3>
+          <ul>
+            {placeholderListings.map((l) => (
+              <li key={l.id} style={{ marginBottom: 8 }}>
+                {l.label} – ({l.latitude}, {l.longitude})
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
     </main>
   );
