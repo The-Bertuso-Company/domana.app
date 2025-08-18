@@ -1,7 +1,8 @@
-// app/beta/page.tsx
+import InviteGate from "./InviteGate";
+
 export const metadata = {
   title: "Domana Private Beta",
-  robots: { index: false, follow: false }, // keep this page out of Google
+  robots: { index: false, follow: false },
 };
 
 export default function BetaPage() {
@@ -23,20 +24,22 @@ export default function BetaPage() {
         </ul>
       </section>
 
-      {/* Signup Form */}
+      {/* Signup Form gated by InviteGate */}
       <section className="mb-8">
         <h2 className="text-xl font-semibold mb-3">Request access</h2>
-        <iframe
-          src="https://docs.google.com/forms/d/e/1FAIpQLSdgNu8TZUOkJDfKwiwMAbt7PrBpb4xwE7l_6IMWPSQir48yXA/viewform?embedded=true"
-          width="100%"
-          height="800"
-          frameBorder={0}
-          marginHeight={0}
-          marginWidth={0}
-          title="Domana Beta Signup"
-        >
-          Loading…
-        </iframe>
+        <InviteGate>
+          <iframe
+            src="https://docs.google.com/forms/d/e/1FAIpQLSdgNu8TZUOkJDfKwiwMAbt7PrBpb4xwE7l_6IMWPSQir48yXA/viewform?embedded=true"
+            width="100%"
+            height="800"
+            frameBorder={0}
+            marginHeight={0}
+            marginWidth={0}
+            title="Domana Beta Signup"
+          >
+            Loading…
+          </iframe>
+        </InviteGate>
       </section>
 
       {/* Privacy Note */}

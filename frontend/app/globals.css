@@ -221,3 +221,52 @@ header {
 .nav-link:hover {
   color: var(--color-primary);
 }
+
+/* ===== Full-bleed Zillow-style split view ===== */
+
+.full-bleed {
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  max-width: 100vw;
+  padding-inline: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+:root { --header-h: 64px; }
+
+/* 60% map / 40% listings */
+.listings-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;          /* ≈ 60% | 40% */
+  gap: 0;
+  height: calc(100vh - var(--header-h));
+}
+
+.map-pane { height: 100%; }
+
+.results-pane {
+  height: 100%;
+  overflow-y: auto;
+  padding: 16px;
+  background: #fff;
+  border-left: 1px solid var(--color-border);
+}
+
+/* Two skinny columns inside the 40% pane */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr)); /* skinnier cards */
+  gap: 12px;
+  align-content: start;
+}
+
+/* Mobile: stack and go single column for cards */
+@media (max-width: 1024px) {
+  .listings-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: 50vh auto;
+  }
+  .results-pane { height: auto; }
+  .results-grid { grid-template-columns: 1fr; }
+}

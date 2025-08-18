@@ -1,5 +1,7 @@
-﻿import SearchBar from "./components/SearchBar";
-import Reveal from "./components/Reveal";
+﻿import SearchBar from "../components/SearchBar";
+import Reveal from "../components/Reveal";
+import DomanaMap from "../components/Map";
+
 
 export default function Home() {
   return (
