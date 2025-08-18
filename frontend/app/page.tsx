@@ -1,6 +1,7 @@
 ﻿import SearchBar from "../src/components/SearchBar";
 import Reveal from "../src/components/Reveal";
-import DomanaMap from "../src/components/DomanaMap";
+import DomanaMap from "@/components/Map";
+
 
 const placeholderListings = [
   { id: 1, longitude: 121.05, latitude: 14.55, label: "₱2.5M" },
