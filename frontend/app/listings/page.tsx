@@ -85,7 +85,7 @@ export default function ListingsPage() {
           <div className="results-grid">
             {placeholderListings.map((listing) => (
               <div key={listing.id} className="card">
-                <img
+                <Image /
                   src={listing.image}
                   alt={`Listing in ${listing.location}`}
                   style={{

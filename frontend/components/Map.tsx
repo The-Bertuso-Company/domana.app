@@ -39,9 +39,9 @@ export default function DomanaMap({ markers = [] as MarkerData[] }) {
     if (!mapRef.current) return;
 
     // remove old markers stored on map instance (simple cleanup approach)
-    // @ts-ignore
+    // @ts-expect-error
     if (mapRef.current.__domanaMarkers) {
-      // @ts-ignore
+      // @ts-expect-error
       mapRef.current.__domanaMarkers.forEach((m: mapboxgl.Marker) => m.remove());
     }
 
@@ -63,7 +63,7 @@ export default function DomanaMap({ markers = [] as MarkerData[] }) {
         .addTo(mapRef.current!);
     });
 
-    // @ts-ignore
+    // @ts-expect-error
     mapRef.current.__domanaMarkers = created;
   }, [markers]);
 

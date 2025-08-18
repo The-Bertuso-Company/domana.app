@@ -54,3 +54,5 @@ out/
 *.log
 .vscode/
 !.env.example
+/.turbo
+.idea/
