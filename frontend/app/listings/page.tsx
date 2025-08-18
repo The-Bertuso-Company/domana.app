@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import Image from "next/image";
 import DomanaMap from "../../components/Map";
 
 const placeholderListings = [
@@ -85,9 +86,11 @@ export default function ListingsPage() {
           <div className="results-grid">
             {placeholderListings.map((listing) => (
               <div key={listing.id} className="card">
-                <Image /
+                <Image
                   src={listing.image}
                   alt={`Listing in ${listing.location}`}
+                  width={600}
+                  height={380}
                   style={{
                     width: "100%",
                     height: "auto",
