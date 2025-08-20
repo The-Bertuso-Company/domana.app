@@ -55,7 +55,7 @@ export default ({ config }) => ({
   },
 
   extra: {
-    mapboxAccessToken: process.env.MAPBOX_ACCESS_TOKEN,
+    mapboxAccessToken: "pk.eyJ1IjoidGhlYmVydHVzb2NvbXBhbnkiLCJhIjoiY21lOHdkcHJkMGs1NTJrcHZubTJ1cDQ5NyJ9.BTMxP06x844eVQtQHBRzaQ",
     router: {},
     eas: {
       projectId: "69982f4e-c195-48d6-923a-986f1b67cd1d"

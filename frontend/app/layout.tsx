@@ -1,5 +1,7 @@
 ﻿import "./globals.css";
 import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Domana",
@@ -13,9 +15,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Neutral, sticky header with red brand accent */}
         <header className="bg-white border-b border-subtle sticky top-0 z-50">
           <div className="container py-3 flex items-center justify-between">
-            <div className="font-semibold tracking-wide text-[var(--color-primary)]">
-              Domana
-            </div>
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/assets/logo.png"   // ✅ Put file in /public/assets/logo.png
+                alt="Domana Logo"
+                width={160}
+                height={50}
+                priority
+              />
+            </Link>
             <nav className="flex items-center gap-5">
               <a className="nav-link" href="#">Buy</a>
               <a className="nav-link" href="#">Rent</a>

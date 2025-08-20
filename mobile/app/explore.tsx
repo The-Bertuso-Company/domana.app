@@ -1,9 +1,9 @@
-// app/(tabs)/map.tsx
+// app/explore.tsx
 import React from "react";
 import { SafeAreaView, StyleSheet } from "react-native";
-import DomanaMap from "../src/components/DomanaMap"; // 👈 adjusted path
+import DomanaMap from "../src/components/DomanaMap";
 
-export default function MapScreen() {
+export default function ExploreScreen() {
   // sample markers (Manila, Cebu, Davao)
   const markers = [
     { id: 1, longitude: 120.9842, latitude: 14.5995, label: "₱5M" },

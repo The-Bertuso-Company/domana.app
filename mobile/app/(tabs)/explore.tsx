@@ -16,7 +16,7 @@ const MAPBOX_ACCESS_TOKEN = Constants.expoConfig?.extra?.mapboxAccessToken || ""
 
 MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
-export default function ExploreScreen() {
+export default function Explore() {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
 
   // Dummy listings (50-mile radius placeholders)
