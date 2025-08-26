@@ -1,46 +1,47 @@
-// app/_layout.tsx
-import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
-import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
+import { useEffect } from "react";
+import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import "react-native-reanimated";
-
-import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
-  const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  });
-
-  if (!loaded) {
-    return null; // Prevent flicker during font load
-  }
+  // Hide the native splash as soon as the app JS is ready.
+  useEffect(() => {
+    (async () => {
+      try {
+        await SplashScreen.hideAsync();
+      } catch {}
+    })();
+  }, []);
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: "#DA291C" },
-          headerTintColor: "#fff",
-          headerTitleStyle: { fontWeight: "bold" },
-        }}
-      >
-        {/* Tabs are the main entry point */}
+    <>
+      <StatusBar style="auto" />
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* Main tab navigator */}
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-        {/* Explore Map */}
-        <Stack.Screen name="explore" options={{ title: "Explore Map" }} />
+        {/* Modal routes (present like iOS modals) */}
+        <Stack.Screen
+          name="(modals)"
+          options={{ presentation: "modal", headerShown: true }}
+        />
 
-        {/* Single Map screen */}
-        <Stack.Screen name="map" options={{ title: "Map" }} />
+        {/* Property detail stack with standard headers */}
+        <Stack.Screen
+          name="property"
+          options={{ headerShown: true, title: "Property" }}
+        />
 
-        {/* Catch-all for unknown routes */}
-        <Stack.Screen name="+not-found" options={{ title: "Not Found" }} />
+        {/* Optional auth flow (kept out of the way for now) */}
+        <Stack.Screen
+          name="(auth)"
+          options={{ headerShown: true, title: "" }}
+        />
+
+        {/* Standalone screens */}
+        <Stack.Screen name="splash" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" options={{ headerShown: true, title: "Oops!" }} />
       </Stack>
-
-      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-    </ThemeProvider>
+    </>
   );
 }

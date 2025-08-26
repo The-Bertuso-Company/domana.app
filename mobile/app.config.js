@@ -36,10 +36,15 @@ export default ({ config }) => ({
     [
       "expo-splash-screen",
       {
+        // splash logo
         image: "./assets/images/splash-icon.png",
         imageWidth: 200,
         resizeMode: "contain",
-        backgroundColor: "#ffffff"
+        // solid background
+        backgroundColor: "#ffffff",
+        // keep splash until we manually hide it
+        // (gives you time to fade into search tab)
+        static: true
       }
     ],
     [
@@ -55,7 +60,8 @@ export default ({ config }) => ({
   },
 
   extra: {
-    mapboxAccessToken: "pk.eyJ1IjoidGhlYmVydHVzb2NvbXBhbnkiLCJhIjoiY21lOHdkcHJkMGs1NTJrcHZubTJ1cDQ5NyJ9.BTMxP06x844eVQtQHBRzaQ",
+    mapboxAccessToken:
+      "pk.eyJ1IjoidGhlYmVydHVzb2NvbXBhbnkiLCJhIjoiY21lOHdkcHJkMGs1NTJrcHZubTJ1cDQ5NyJ9.BTMxP06x844eVQtQHBRzaQ",
     router: {},
     eas: {
       projectId: "69982f4e-c195-48d6-923a-986f1b67cd1d"

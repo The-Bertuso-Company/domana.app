@@ -1,3 +1,4 @@
+// src/components/DomanaMap.tsx
 import React, { useEffect, useState, useRef } from "react";
 import MapboxGL from "@rnmapbox/maps";
 import Constants from "expo-constants";
@@ -8,38 +9,58 @@ type MarkerData = {
   id: number;
   longitude: number;
   latitude: number;
-  label?: string; // e.g., price
+  label?: string;
 };
 
-// Get token from app.config.js → extra.mapboxAccessToken
 const mapboxToken = Constants.expoConfig?.extra?.mapboxAccessToken;
 MapboxGL.setAccessToken(mapboxToken);
 
+// Philippines bounding box
+const PH_BOUNDS = {
+  sw: [116.933, 4.225],
+  ne: [126.601, 21.321],
+};
+
 export default function DomanaMap({ markers = [] as MarkerData[] }) {
-  const [mapReady, setMapReady] = useState(false);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [userCoords, setUserCoords] = useState<[number, number] | null>(null);
+  const [inPH, setInPH] = useState(false);
   const cameraRef = useRef<MapboxGL.Camera>(null);
 
-  // Ask for permissions
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       setHasPermission(status === "granted");
+
+      if (status === "granted") {
+        const loc = await Location.getCurrentPositionAsync({});
+        const { latitude, longitude } = loc.coords;
+        const coords: [number, number] = [longitude, latitude];
+        setUserCoords(coords);
+
+        // check if inside PH
+        if (
+          latitude >= PH_BOUNDS.sw[1] &&
+          latitude <= PH_BOUNDS.ne[1] &&
+          longitude >= PH_BOUNDS.sw[0] &&
+          longitude <= PH_BOUNDS.ne[0]
+        ) {
+          setInPH(true);
+        }
+      }
     })();
   }, []);
 
-  // Handle "My Location" button tap
   const recenterOnUser = () => {
-    if (cameraRef.current) {
+    if (cameraRef.current && userCoords && inPH) {
       cameraRef.current.setCamera({
-        followUserLocation: true,
-        zoomLevel: 14,
+        centerCoordinate: userCoords,
+        zoomLevel: 9,
         animationDuration: 1000,
       });
     }
   };
 
-  // Show fallback while checking permission
   if (hasPermission === null) {
     return (
       <View style={styles.center}>
@@ -48,79 +69,62 @@ export default function DomanaMap({ markers = [] as MarkerData[] }) {
     );
   }
 
-  // Show fallback if permission denied
   if (hasPermission === false) {
     return (
       <View style={styles.center}>
         <Text style={{ textAlign: "center", color: "#555" }}>
-          Location permission denied.  
-          Showing default map view.
+          Location permission denied.{"\n"}
+          Showing Philippines map.
         </Text>
-        {/* Still render PH map with markers */}
         <View style={{ flex: 1, width: "100%", marginTop: 10 }}>
           <MapboxGL.MapView style={styles.map}>
-            <MapboxGL.Camera
-              zoomLevel={5}
-              centerCoordinate={[121.774, 12.8797]}
-            />
-            {markers.map((m) => (
-              <MapboxGL.PointAnnotation
-                key={m.id}
-                id={`marker-${m.id}`}
-                coordinate={[m.longitude, m.latitude]}
-              >
-                <View style={styles.marker}>
-                  <Text style={styles.markerText}>{m.label ?? "●"}</Text>
-                </View>
-              </MapboxGL.PointAnnotation>
-            ))}
+            <MapboxGL.Camera bounds={{ sw: PH_BOUNDS.sw, ne: PH_BOUNDS.ne }} />
           </MapboxGL.MapView>
         </View>
       </View>
     );
   }
 
-  // Normal render (permission granted)
   return (
     <View style={styles.container}>
       <MapboxGL.MapView
         style={styles.map}
         styleURL="mapbox://styles/mapbox/streets-v12"
-        compassEnabled={true}
-        scaleBarEnabled={true}
+        compassEnabled
+        scaleBarEnabled
         logoEnabled={false}
         attributionEnabled={false}
-        onDidFinishLoadingMap={() => setMapReady(true)}
       >
-        <MapboxGL.Camera
-          ref={cameraRef}
-          zoomLevel={13}
-          followUserLocation={true}
-          followUserMode="normal"
-        />
-
-        {mapReady && (
-          <>
-            <MapboxGL.UserLocation visible={true} />
-            {markers.map((m) => (
-              <MapboxGL.PointAnnotation
-                key={m.id}
-                id={`marker-${m.id}`}
-                coordinate={[m.longitude, m.latitude]}
-              >
-                <View style={styles.marker}>
-                  <Text style={styles.markerText}>{m.label ?? "●"}</Text>
-                </View>
-              </MapboxGL.PointAnnotation>
-            ))}
-          </>
+        {inPH && userCoords ? (
+          <MapboxGL.Camera
+            ref={cameraRef}
+            centerCoordinate={userCoords}
+            zoomLevel={9} // ~50 mile radius
+          />
+        ) : (
+          <MapboxGL.Camera bounds={{ sw: PH_BOUNDS.sw, ne: PH_BOUNDS.ne }} />
         )}
+
+        {inPH && <MapboxGL.UserLocation visible />}
+
+        {markers.map((m) => (
+          <MapboxGL.PointAnnotation
+            key={m.id}
+            id={`marker-${m.id}`}
+            coordinate={[m.longitude, m.latitude]}
+          >
+            <View style={styles.marker}>
+              <Text style={styles.markerText}>{m.label ?? "●"}</Text>
+            </View>
+          </MapboxGL.PointAnnotation>
+        ))}
       </MapboxGL.MapView>
 
-      {/* Floating "My Location" button */}
-      <TouchableOpacity style={styles.locButton} onPress={recenterOnUser}>
-        <Text style={styles.locButtonText}>◎</Text>
-      </TouchableOpacity>
+      {inPH && (
+        <TouchableOpacity style={styles.locButton} onPress={recenterOnUser}>
+          <Text style={styles.locButtonText}>◎</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
