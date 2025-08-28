@@ -1,47 +1,47 @@
+// app/_layout.tsx
 import { Stack } from "expo-router";
 import { useEffect } from "react";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function RootLayout() {
-  // Hide the native splash as soon as the app JS is ready.
   useEffect(() => {
     (async () => {
       try {
         await SplashScreen.hideAsync();
-      } catch {}
+      } catch {
+        // ignore
+      }
     })();
   }, []);
 
   return (
-    <>
+    <SafeAreaProvider>
       <StatusBar style="auto" />
       <Stack screenOptions={{ headerShown: false }}>
-        {/* Main tab navigator */}
+        {/* Main tabs */}
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-        {/* Modal routes (present like iOS modals) */}
+        {/* Modals group; each modal sets its own header */}
         <Stack.Screen
           name="(modals)"
-          options={{ presentation: "modal", headerShown: true }}
+          options={{ presentation: "modal", headerShown: false }}
         />
 
-        {/* Property detail stack with standard headers */}
+        {/* Property stack */}
         <Stack.Screen
           name="property"
           options={{ headerShown: true, title: "Property" }}
         />
 
-        {/* Optional auth flow (kept out of the way for now) */}
-        <Stack.Screen
-          name="(auth)"
-          options={{ headerShown: true, title: "" }}
-        />
+        {/* Auth (stub) */}
+        <Stack.Screen name="(auth)" options={{ headerShown: true, title: "" }} />
 
-        {/* Standalone screens */}
+        {/* Standalone */}
         <Stack.Screen name="splash" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" options={{ headerShown: true, title: "Oops!" }} />
       </Stack>
-    </>
+    </SafeAreaProvider>
   );
 }
