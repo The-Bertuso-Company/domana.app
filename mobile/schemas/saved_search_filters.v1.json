@@ -1,0 +1,37 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://domana.app/schemas/saved_search_filters.v1.json",
+  "title": "Saved Search Filters v1",
+  "type": "object",
+  "properties": {
+    "intent": { "type": "string", "enum": ["sale", "rent"] },
+    "price_min": { "type": "number", "minimum": 0 },
+    "price_max": { "type": "number", "minimum": 0 },
+    "beds_min": { "type": "number", "minimum": 0 },
+    "baths_min": { "type": "number", "minimum": 0 },
+    "property_types": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["house","condo","townhouse","lot","farm","land","commercial_lite"] },
+      "uniqueItems": true
+    },
+    "keywords": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "bbox": {
+      "description": "minLng, minLat, maxLng, maxLat (WGS84). Use instead of polygon when possible.",
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "h3_res": { "type": "integer", "minimum": 4, "maximum": 12 },
+    "h3_cells": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    }
+  },
+  "additionalProperties": true
+}

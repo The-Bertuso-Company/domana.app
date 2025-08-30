@@ -1,0 +1,36 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://domana.app/schemas/address.v1.json",
+  "title": "Address v1",
+  "type": "object",
+  "required": [
+    "country_code",
+    "region",
+    "province",
+    "city_municipality",
+    "barangay",
+    "street_address",
+    "postal_code",
+    "location"
+  ],
+  "properties": {
+    "country_code": { "type": "string", "enum": ["PH", "US"] },
+    "region": { "type": "string", "minLength": 1 },
+    "province": { "type": "string", "minLength": 1 },
+    "city_municipality": { "type": "string", "minLength": 1 },
+    "barangay": { "type": "string", "minLength": 1 },
+    "subdivision": { "type": "string" },
+    "street_address": { "type": "string" },
+    "postal_code": { "type": "string", "pattern": "^[0-9]{4}$" },
+    "formatted_address": { "type": "string" },
+    "location": {
+      "type": "object",
+      "required": ["lat", "lng"],
+      "properties": {
+        "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+        "lng": { "type": "number", "minimum": -180, "maximum": 180 }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,23 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://domana.app/schemas/saved_search.v1.json",
+  "title": "SavedSearch v1",
+  "type": "object",
+  "required": ["id","user_id","filters","is_active","created_at","updated_at"],
+  "properties": {
+    "id": { "type": "string" },
+    "user_id": { "type": "string" },
+    "name": { "type": ["string","null"] },
+    "filters": { "$ref": "./saved_search_filters.v1.json" },
+    "area_polygon": {
+      "description": "Optional polygon AOI (WGS84). Server stores as PostGIS geography polygon.",
+      "type": ["object","null"]
+    },
+    "last_notified_at": { "type": ["string","null"], "format": "date-time" },
+    "last_evaluated_at": { "type": ["string","null"], "format": "date-time" },
+    "is_active": { "type": "boolean", "default": true },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

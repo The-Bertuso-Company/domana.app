@@ -38,3 +38,25 @@ frontend/node_modules/
 backups/
 frontend/backups/
 *.zip
+
+# Expo / React Native
+.expo/
+.expo-shared/
+web-build/
+
+# Local env (never commit real secrets)
+.env
+.env.*
+!.env.example  # template is safe to keep
+
+
+# backup/disabled files
+**/*.bak
+**/*.disabled
+**/*.backup.json
+**/*.corrupt.bak
+
+
+# env/secrets
+env.local
+.npmrc

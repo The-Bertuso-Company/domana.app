@@ -1,11 +1,13 @@
 // components/TabBarIcon.tsx
-import { Ionicons } from "@expo/vector-icons";
+import * as React from 'react';
+import { Ionicons } from '@expo/vector-icons';
 
 type Props = {
-  name: React.ComponentProps<typeof Ionicons>["name"];
-  color: string;
+  name: React.ComponentProps<typeof Ionicons>['name'];
+  color?: string;
+  size?: number;
 };
 
-export default function TabBarIcon({ name, color }: Props) {
-  return <Ionicons name={name} size={22} color={color} />;
+export default function TabBarIcon({ name, color, size = 24 }: Props) {
+  return <Ionicons name={name} color={color} size={size} />;
 }

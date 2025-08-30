@@ -1,77 +1,83 @@
-// app/(tabs)/_layout.tsx
+﻿/* app/(tabs)/_layout.tsx */
+import * as React from "react";
 import { Tabs } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import TabBarIcon from "@/components/TabBarIcon";
+import { ToastProvider } from "@/src/components/Toast";
+import SystemBars from "@/src/components/SystemBars";
+import { useScheme } from "@/src/hooks/useScheme";
+import { c } from "@/src/design/theme";
 
 export default function TabsLayout() {
-  return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: "#111111",
-        tabBarInactiveTintColor: "#9CA3AF",
-        tabBarStyle: { height: 60, paddingBottom: 8, paddingTop: 8 },
-        tabBarLabelStyle: { fontSize: 12, marginTop: -2 },
-      }}
-    >
-      <Tabs.Screen
-        name="search/index"
-        options={{
-          title: "Search",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? "search" : "search-outline"} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="updates/index"
-        options={{
-          title: "Updates",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "notifications" : "notifications-outline"}
-              color={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="saved/index"
-        options={{
-          title: "Saved",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? "heart" : "heart-outline"} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="sell/index"
-        options={{
-          title: "Sell",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "add-circle" : "add-circle-outline"}
-              color={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="inbox/index"
-        options={{
-          title: "Inbox",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "chatbubbles" : "chatbubbles-outline"}
-              color={color}
-            />
-          ),
-        }}
-      />
+  const insets = useSafeAreaInsets();
+  const scheme = useScheme();
+  const colors = c(scheme);
+  const bottomPad = Math.max(insets.bottom, 12);
 
-      {/* Hide child routes so they never render as tabs */}
-      <Tabs.Screen name="search/list" options={{ href: null }} />
-      <Tabs.Screen name="search/map" options={{ href: null }} />
-      {/* Do NOT declare inbox/[threadId] here; it auto-registers from /app/inbox */}
-    </Tabs>
+  return (
+    <ToastProvider>
+      <SystemBars />
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarHideOnKeyboard: true,
+          tabBarActiveTintColor: colors.brand.hex,
+          tabBarInactiveTintColor: colors.muted?.hex ?? "#9CA3AF",
+          tabBarStyle: {
+            height: 60 + bottomPad,
+            paddingBottom: bottomPad,
+            paddingTop: 8,
+            borderTopWidth: 0.5,
+            borderTopColor: scheme === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
+            backgroundColor: colors.bg.hex,
+          },
+          tabBarLabelStyle: { fontSize: 12, marginTop: -2 },
+        }}
+      >
+        {/* The 5 real tabs */}
+        <Tabs.Screen
+          name="explore/index"
+          options={{
+            title: "Explore",
+            tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="activity/index"
+          options={{
+            title: "Activity",
+            tabBarIcon: ({ color }) => <TabBarIcon name="notifications-outline" color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="sell/index"
+          options={{
+            title: "Sell",
+            tabBarIcon: ({ color }) => <TabBarIcon name="add-circle-outline" color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="pro/index"
+          options={{
+            title: "Pro",
+            tabBarIcon: ({ color }) => <TabBarIcon name="briefcase-outline" color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="me/index"
+          options={{
+            title: "Me",
+            tabBarIcon: ({ color }) => <TabBarIcon name="person-outline" color={color} />,
+          }}
+        />
+
+        {/* Hide nested screens so they don't become tabs */}
+        <Tabs.Screen name="explore/list" options={{ href: null }} />
+        <Tabs.Screen name="explore/map" options={{ href: null }} />
+        <Tabs.Screen name="activity/inbox" options={{ href: null }} />
+        <Tabs.Screen name="activity/saved" options={{ href: null }} />
+        <Tabs.Screen name="activity/updates" options={{ href: null }} />
+      </Tabs>
+    </ToastProvider>
   );
 }
