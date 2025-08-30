@@ -60,3 +60,8 @@ web-build/
 # env/secrets
 env.local
 .npmrc
+
+
+## allow env examples
+!**/.env.example
+!**/.env.*.example
