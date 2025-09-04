@@ -1,4 +1,4 @@
-
+import { getTheme } from "../ui/tokens";
 import { View } from "react-native";
 import { useColorScheme } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,11 +8,6 @@ import { Slot } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ToastProvider } from '../src/providers/toast';
-
-/* --- inline DS theme (auto) --- */
-const __TH_LIGHT = { bg:"#FFFFFF", surface:"#F7F7FA", card:"#FFFFFF", border:"#E6E6EB", text:"#0B0B0F", muted:"#6B6B76", primary:"#E53935" };
-const __TH_DARK  = { bg:"#0B0B0F", surface:"#111217", card:"#151821", border:"#2A2D35", text:"#F2F3F7", muted:"#A3A6AF", primary:"#FF4D4D" };
-function __getTheme(scheme){ return scheme === "dark" ? __TH_DARK : __TH_LIGHT; }
 try { require('../src/utils/monitoring'); } catch (e) {}
 
 const queryClient = new QueryClient();
@@ -24,9 +19,7 @@ const __DomanaBG = ({children}: any) => {
 
 
 
-
-
-  const th = __getTheme(scheme as any);
+    const th = getTheme(scheme as any);
   const bg = th.bg;
 return (
     <SafeAreaView style={{ flex: 1, backgroundColor: bg }} edges={["top","left","right"]}>
