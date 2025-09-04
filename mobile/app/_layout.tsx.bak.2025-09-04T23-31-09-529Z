@@ -30,7 +30,7 @@ const __DomanaBG = ({children}: any) => {
   const bg = th.bg;
 return (
     <SafeAreaView style={{ flex: 1, backgroundColor: bg }} edges={["top","left","right"]}>
-      <StatusBar style={scheme === "dark" ? "light" : "dark"}   animated  />
+      <StatusBar style={scheme === "dark" ? "light" : "dark"} backgroundColor={bg}  animated />
       <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 8 }}>
         {children}
       </View>
