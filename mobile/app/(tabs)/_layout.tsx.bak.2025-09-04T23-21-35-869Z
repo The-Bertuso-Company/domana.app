@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useColorScheme } from "react-native";
 
 /* --- inline DS theme (auto) --- */
@@ -10,21 +10,19 @@ function __getTheme(scheme){ return scheme === "dark" ? __TH_DARK : __TH_LIGHT; 
 export default function TabLayout() {
   const scheme = useColorScheme();
 
-      const insets = useSafeAreaInsets();
-  const pb = insets.bottom || 0;
-const th = __getTheme(scheme as any);
+    const th = __getTheme(scheme as any);
   const bg = th.bg;
 return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: th.bg }} edges={["left","right","bottom"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: th.bg }} edges={["left","right"]}>
       <Tabs
-        screenOptions={({ route }) => ({ 
+        screenOptions={{
           headerShown: false,
-          tabBarStyle: { backgroundColor: th.surface, borderTopColor: th.border,height: 52 + pb, paddingBottom: pb },
+          tabBarStyle: { backgroundColor: th.surface, borderTopColor: th.border, height: 52 },
           tabBarActiveTintColor: th.primary,
           tabBarInactiveTintColor: th.muted,
           tabBarLabelStyle: { fontSize: 12, fontWeight: "600" },
           tabBarHideOnKeyboard: true
-         })}>
+        }}>
         <Tabs.Screen name="index" options={{ title: "Explore" }} />
         <Tabs.Screen name="activity/index" options={{ title: "Activity" }} />
         <Tabs.Screen name="sell/index" options={{ title: "Sell" }} />
