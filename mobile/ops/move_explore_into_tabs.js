@@ -1,9 +1,19 @@
-﻿import { useColorScheme, View, Text, FlatList } from "react-native";
+﻿const fs = require("fs");
+const path = require("path");
+const root = process.env.REPO_ROOT || "";
+const mobile = path.join(root, "mobile");
+
+const tabsIndex = path.join(mobile, "app/(tabs)/index.tsx");
+const exploreDir = path.join(mobile, "app/explore");
+const exploreFile = path.join(exploreDir, "index.tsx");
+
+// DS-themed Explore content that belongs INSIDE the tabs group
+const screen = `import { useColorScheme, View, Text, FlatList } from "react-native";
 
 /* --- inline DS theme (auto) --- */
 const __TH_LIGHT = { bg:"#FFFFFF", surface:"#F7F7FA", card:"#FFFFFF", border:"#E6E6EB", text:"#0B0B0F", muted:"#6B6B76", primary:"#E53935" };
 const __TH_DARK  = { bg:"#0B0B0F", surface:"#111217", card:"#151821", border:"#2A2D35", text:"#F2F3F7", muted:"#A3A6AF", primary:"#FF4D4D" };
-function __getTheme(scheme: "light" | "dark" | null | undefined){ return scheme === "dark" ? __TH_DARK : __TH_LIGHT; }
+function __getTheme(scheme){ return scheme === "dark" ? __TH_DARK : __TH_LIGHT; }
 
 const DEMO = [
   { id: "1", price: 525000, beds: 3, baths: 2, sqft: 1420, addr: "101 Oak St", verified: 1 },
@@ -14,7 +24,7 @@ const DEMO = [
   { id: "6", price: 458000, beds: 3, baths: 2, sqft: 1280, addr: "606 Spruce Rd", verified: 0 },
 ];
 
-const Card = ({ th, item }: any) => (
+const Card = ({ th, item }) => (
   <View style={{
     backgroundColor: th.card, borderColor: th.border, borderWidth: 1,
     borderRadius: 12, padding: 12, marginHorizontal: 16, marginVertical: 8
@@ -32,17 +42,15 @@ const Card = ({ th, item }: any) => (
   </View>
 );
 
-export default function ExploreScreen() {
+export default function ExploreTabScreen() {
   const scheme = useColorScheme();
-  const th = __getTheme(scheme as any);
-
+  const th = __getTheme(scheme);
   return (
     <View style={{ flex: 1, backgroundColor: th.bg }}>
       <View style={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4 }}>
         <Text style={{ color: th.text, fontSize: 22, fontWeight: "700" }}>Explore</Text>
         <Text style={{ color: th.muted, marginTop: 4 }}>Demo listings (visual baseline)</Text>
       </View>
-
       <FlatList
         data={DEMO}
         keyExtractor={(it) => it.id}
@@ -52,3 +60,26 @@ export default function ExploreScreen() {
     </View>
   );
 }
+`;
+
+function writeTabsIndex() {
+  const dir = path.dirname(tabsIndex);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  const ts = new Date().toISOString().replace(/[:.]/g,"-");
+  if (fs.existsSync(tabsIndex)) fs.copyFileSync(tabsIndex, tabsIndex + ".bak."+ts);
+  fs.writeFileSync(tabsIndex, screen, "utf8");
+  console.log("Updated (tabs)/index.tsx to real Explore screen.");
+}
+
+function removeStandaloneExplore() {
+  if (fs.existsSync(exploreFile)) {
+    fs.rmSync(exploreFile);
+    console.log("Removed standalone app/explore/index.tsx (no longer needed).");
+  }
+  if (fs.existsSync(exploreDir) && fs.readdirSync(exploreDir).length === 0) {
+    fs.rmdirSync(exploreDir);
+  }
+}
+
+writeTabsIndex();
+removeStandaloneExplore();
