@@ -1,0 +1,23 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://domana.app/schemas/tour.v1.json",
+  "title": "Tour v1",
+  "type": "object",
+  "required": ["id","listing_id","requester_user_id","start_at","end_at","location_type","status","created_at","updated_at"],
+  "properties": {
+    "id": { "type": "string" },
+    "listing_id": { "type": "string" },
+    "requester_user_id": { "type": "string" },
+    "agent_id": { "type": ["string","null"] },
+    "timezone": { "type": "string", "default": "Asia/Manila" },
+    "start_at": { "type": "string", "format": "date-time" },
+    "end_at": { "type": "string", "format": "date-time" },
+    "location_type": { "type": "string", "enum": ["on_site","virtual"] },
+    "location_url": { "type": ["string","null"] },
+    "note": { "type": ["string","null"] },
+    "status": { "type": "string", "enum": ["requested","confirmed","cancelled","completed"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

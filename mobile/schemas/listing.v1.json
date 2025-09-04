@@ -1,0 +1,61 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://domana.app/schemas/listing.v1.json",
+  "title": "Listing v1",
+  "type": "object",
+  "required": [
+    "id",
+    "status",
+    "intent",
+    "property_type",
+    "price",
+    "address",
+    "location",
+    "published_at",
+    "created_at",
+    "updated_at",
+    "version"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "status": { "type": "string", "enum": ["active", "pending", "sold", "off_market"] },
+    "intent": { "type": "string", "enum": ["sale", "rent"] },
+    "property_type": { "type": "string", "enum": ["house", "condo", "townhouse", "lot", "farm", "land", "commercial_lite"] },
+    "price": {
+      "type": "object",
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": { "type": "number", "minimum": 0 },
+        "currency": { "type": "string", "enum": ["PHP"] },
+        "frequency": { "type": "string", "enum": ["one_time", "monthly"] }
+      }
+    },
+    "beds": { "type": "number", "minimum": 0 },
+    "baths": { "type": "number", "minimum": 0 },
+    "floor_area_sqm": { "type": "number", "minimum": 0 },
+    "lot_area_sqm": { "type": "number", "minimum": 0 },
+    "year_built": { "type": "integer", "minimum": 1800, "maximum": 2100 },
+    "address": { "$ref": "./address.v1.json" },
+    "location": {
+      "type": "object",
+      "required": ["lat", "lng"],
+      "properties": {
+        "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+        "lng": { "type": "number", "minimum": -180, "maximum": 180 }
+      }
+    },
+    "h3_res9": { "type": "string" },
+    "agent_id": { "type": ["string", "null"] },
+    "owner_id": { "type": ["string", "null"] },
+    "source": { "type": "string", "enum": ["manual", "csv", "partner"] },
+    "external_source_id": { "type": "string" },
+    "attrs": { "type": "object", "additionalProperties": true },
+    "media_set_id": { "type": ["string", "null"] },
+    "published_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": ["string", "null"], "format": "date-time" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "version": { "type": "integer", "minimum": 1 }
+  },
+  "additionalProperties": false
+}

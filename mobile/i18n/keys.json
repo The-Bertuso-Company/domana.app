@@ -1,0 +1,28 @@
+﻿{
+  "property_type": {
+    "house": {"en":"House","tl":"Bahay"},
+    "condo": {"en":"Condominium","tl":"Kondominyum"},
+    "townhouse": {"en":"Townhouse","tl":"Townhouse"},
+    "lot": {"en":"Lot","tl":"Lote"},
+    "farm": {"en":"Farm","tl":"Bukirin"},
+    "land": {"en":"Land","tl":"Lupa"},
+    "commercial_lite": {"en":"Commercial (Lite)","tl":"Pang-komersyo (Lite)"}
+  },
+  "status": {
+    "active":{"en":"Active","tl":"Aktibo"},
+    "pending":{"en":"Pending","tl":"Nakabinbin"},
+    "sold":{"en":"Sold","tl":"Nabenta"},
+    "off_market":{"en":"Off Market","tl":"Hindi ibinebenta"}
+  },
+  "badges": {
+    "docs_verified":{"en":"Documents Verified","tl":"Nasuri ang mga Dokumento"},
+    "site_verified":{"en":"Site Verified","tl":"Nasuri sa Lugar"},
+    "agent_verified":{"en":"Agent Verified","tl":"Nasuri ang Ahente"}
+  },
+  "ui": {
+    "beds": {"en":"Beds","tl":"Kuwarto"},
+    "baths": {"en":"Baths","tl":"Banyo"},
+    "price": {"en":"Price","tl":"Presyo"},
+    "sq_m": {"en":"sqm","tl":"sqm"}
+  }
+}

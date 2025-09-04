@@ -1,0 +1,147 @@
+﻿openapi: 3.1.0
+info:
+  title: Domana Public API
+  version: "1.0.0"
+servers:
+  - url: https://api.domana.app
+paths:
+  /v1/listings:
+    get:
+      summary: Search listings
+      parameters:
+        - in: query; name: intent; schema: {type: string, enum: [sale, rent]}
+        - in: query; name: bbox; description: "minLng,minLat,maxLng,maxLat"; schema: {type: string}
+        - in: query; name: q; schema: {type: string}
+        - in: query; name: page; schema: {type: integer, minimum: 1, default: 1}
+        - in: query; name: per_page; schema: {type: integer, minimum: 1, maximum: 100, default: 20}
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Domana-Schema-Listing: {schema: {type: string}, description: "SemVer for listing schema"}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: {$ref: "#/components/schemas/Listing"}
+                  next_cursor: {type: string, nullable: true}
+    post:
+      summary: Ingest manual listing (admin/partner)
+      security: [{ ApiKeyAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/Listing"}
+      responses:
+        "201": {description: Created}
+  /v1/listings/{id}:
+    get:
+      summary: Get listing by id
+      parameters:
+        - in: path; name: id; required: true; schema: {type: string}
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Listing"}
+    patch:
+      summary: Update listing (restricted)
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path; name: id; required: true; schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        "200": {description: Updated}
+  /v1/agents:
+    get:
+      summary: List agents
+      responses: {"200": {description: OK}}
+  /v1/owners:
+    get:
+      summary: List owners
+      responses: {"200": {description: OK}}
+  /v1/threads:
+    post:
+      summary: Create thread
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/Thread"}
+      responses: {"201": {description: Created}}
+  /v1/tours:
+    post:
+      summary: Create tour
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/Tour"}
+      responses: {"201": {description: Created}}
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+  schemas:
+    Address:
+      type: object
+      properties:
+        country_code: {type: string}
+        region: {type: string}
+        province: {type: string}
+        city_municipality: {type: string}
+        barangay: {type: string}
+        street_address: {type: string}
+        postal_code: {type: string}
+        location:
+          type: object
+          properties: {lat: {type: number}, lng: {type: number}}
+    Listing:
+      type: object
+      properties:
+        id: {type: string}
+        status: {type: string, enum: [active, pending, sold, off_market]}
+        intent: {type: string, enum: [sale, rent]}
+        property_type: {type: string}
+        price:
+          type: object
+          properties: {amount: {type: number}, currency: {type: string}, frequency: {type: string}}
+        beds: {type: number, nullable: true}
+        baths: {type: number, nullable: true}
+        floor_area_sqm: {type: number, nullable: true}
+        lot_area_sqm: {type: number, nullable: true}
+        address: {$ref: "#/components/schemas/Address"}
+        location: {type: object, properties: {lat: {type: number}, lng: {type: number}}}
+        media_set_id: {type: string, nullable: true}
+        created_at: {type: string}
+        updated_at: {type: string}
+    Thread:
+      type: object
+      properties:
+        id: {type: string}
+        listing_id: {type: string}
+        created_by_user_id: {type: string}
+        participants: {type: array, items: {type: object}}
+    Tour:
+      type: object
+      properties:
+        id: {type: string}
+        listing_id: {type: string}
+        requester_user_id: {type: string}
+        start_at: {type: string}
+        end_at: {type: string}
+        location_type: {type: string, enum: [on_site, virtual]}

@@ -1,2 +1,4 @@
-export const formatPHP = (n:number) =>
-  `₱${n.toLocaleString("en-PH", { maximumFractionDigits: 0 })}`;
+﻿export function peso(n?: number) {
+  if (typeof n !== "number") return "";
+  return "₱" + n.toLocaleString();
+}

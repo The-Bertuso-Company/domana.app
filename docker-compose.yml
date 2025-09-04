@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: domana-db
+    environment:
+      POSTGRES_DB: domanadev
+      POSTGRES_USER: domana
+      POSTGRES_PASSWORD: domana
+    ports:
+      - "55432:5432"
+    volumes:
+      - domana-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U domana -d domanadev"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  domana-pgdata:

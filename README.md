@@ -26,45 +26,85 @@ Our mission is to make buying, selling, and exploring property easy, transparent
 
 ---
 
-## 🖥️ MVP Screens
-1. **Home / Search**  
-2. **Listing Details**  
+## 🖥️ / 📱 MVP Screens
+1. **Home / Search (Map-first)**
+2. **Listing Details**
 3. **Contact Seller/Agent**
 
 ---
 
 ## 📊 Success Metrics (MVP)
 - **100** verified listings live in first 90 days after launch  
-- **500** monthly active users browsing properties
+- **500** monthly active users browsing properties  
+- **≥ 99.0%** crash-free sessions (mobile)  
+- **p75 cold start < 3.5s** (mobile, release builds)
 
 ---
 
 ## 🧱 Tech Stack
-**Frontend:** Next.js, React, Tailwind CSS  
+
+**Mobile:** React Native (Expo, Expo Router)  
+**Web (optional for now):** Next.js, React, Tailwind CSS  
 **Backend:** Node.js, Express (API), PostgreSQL  
-**Infra:** Vercel (frontend). Backend hosting TBD  
-**Monitoring:** Sentry  
-**Maps:** Mapbox  
+**Infra:** Vercel (web). **Mobile builds:** Expo EAS. **Backend hosting:** TBD  
+**Monitoring:** Sentry (Next.js + sentry-expo for RN)  
+**Maps:** Mapbox (use public-scoped token on client)  
 **Payments (future):** Xendit or PayMongo
 
-> Note: Keep stack minimal during MVP. Add tools only when the pain is real.
+> Keep stack minimal during MVP. Add tools only when the pain is real.
+
+---
+
+## 📦 Repo Structure
+
+.
+├─ mobile/ # Expo app (primary MVP client)
+├─ frontend/ # Next.js web (parking lot / optional)
+├─ backend/ # Node + Express API (WIP)
+└─ docs/
+├─ schemas/ # JSON/YAML schemas (listing.v1, agent.v1, etc.)
+└─ api/ # contracts, versioning notes
+
 
 ---
 
 ## 🛠️ Local Development
 
-### Prerequisites
-- Node.js 18+  
-- pnpm or npm  
-- PostgreSQL 14+ (if running backend locally)
+### Requirements
+- Node.js **18+** (LTS recommended)  
+- pnpm **8+** (or npm)  
+- PostgreSQL **14+** (if running backend locally)  
+- (Mobile) Android Studio / Xcode for emulators
 
-### Frontend (Next.js)
+### Mobile (Expo)
 ```bash
 # from repo root
+cd mobile
+pnpm install            # or: npm install
+cp .env.example .env    # fill values
+
+# run
+pnpm start              # or: npx expo start
+# build (cloud)
+pnpm expo:build         # wrapper for: npx eas build -p android|ios
+# OTA update (when configured)
+pnpm expo:update
+
+Common env keys (example):
+
+EXPO_PUBLIC_APP_NAME=Domana
+EXPO_PUBLIC_MAPBOX_TOKEN=your_mapbox_public_token
+SENTRY_DSN=https://your_sentry_dsn
+SENTRY_ENV=development
+
+    Use EXPO_PUBLIC_* for values that ship to the client. Never embed private tokens in the app.
+
+Web (Next.js)
+
 cd frontend
-pnpm install        # or: npm install
-cp .env.example .env.local  # fill values
-pnpm dev            # or: npm run dev
+pnpm install
+cp .env.example .env.local
+pnpm dev
 
 Common env keys (example):
 
@@ -76,10 +116,9 @@ SENTRY_PROJECT=javascript-nextjs
 
 Backend (Node + Express)
 
-# from repo root
 cd backend
 pnpm install
-cp .env.example .env        # fill values
+cp .env.example .env
 pnpm dev
 
 Common env keys (example):
@@ -87,61 +126,72 @@ Common env keys (example):
 DATABASE_URL=postgres://user:pass@localhost:5432/domanadb
 JWT_SECRET=change_me
 
-    If backend is not ready yet, stub API responses in the frontend using mock data or a simple /api route in Next.js.
-```
+    If backend isn’t ready, stub API responses in the mobile/web clients (mock data or Next.js /api routes).
+
 🧪 Testing
 
-    Unit tests: pnpm test
+pnpm test        # unit tests
+pnpm lint        # eslint
+pnpm typecheck   # ts types
 
-    Lint: pnpm lint
-
-    Type check: pnpm typecheck
-
-Add these as required checks on main when CI is set up.
+Make these required checks on PRs to main once CI is wired up.
 🚀 Deployments
+Mobile (Expo)
 
-Frontend: Vercel
+    Builds: EAS Build (internal → TestFlight / Closed Testing)
 
-    Create VERCEL_PROJECT_ID and VERCEL_ORG_ID locally if using CLI
+    Channels: development, preview, production
 
-    Add environment variables in Vercel Project Settings → Environment Variables
+    OTA: EAS Update for safe JS/asset updates (no native changes)
+
+Web
+
+    Host: Vercel
+
+    Create VERCEL_PROJECT_ID & VERCEL_ORG_ID locally if using CLI
+
+    Add environment variables in Vercel → Project Settings → Environment Variables
 
     Set Production to main branch
 
-Backend: TBD
+Backend (TBD)
 
-    Options: Fly.io, Railway, Render, or AWS Lightsail
+    Options: Fly.io, Railway, Render, AWS Lightsail
 
-    Use a managed Postgres if possible for reliability
+    Prefer managed Postgres in production
 
 🧯 Monitoring (Sentry)
 
-    Installed via Sentry Wizard for Next.js
+    Web: Installed via Sentry Wizard for Next.js
 
-    Confirm release tags in CI to track deploys
+    Mobile: sentry-expo (React Native). Configure DSN, environment, release, and dist
 
-    Set alerts for unhandled exceptions and API error rates
+    Tag releases in CI to track deploys
 
-🔐 Security and Privacy
+    Alerts: unhandled exceptions, API error rates, slowdown spikes
 
-    Do not commit secrets. Use .env* and Vercel project envs
+🔐 Security & Privacy
+
+    Do not commit secrets. Use .env*, Vercel/Expo project envs, and platform secrets
 
     Rotate tokens on role change or contractor access
 
     Sanitize PII in logs
 
-    For production, enforce HTTPS everywhere
+    Enforce HTTPS in production
+
+    Use public-scoped Mapbox tokens on client; keep private tokens server-side
 
 🔁 Beta Program
 
-Closed beta via:
+    iOS: TestFlight (Closed/Internal)
 
-    TestFlight (iOS)
+    Android: Google Play Closed Testing
 
-    Google Play Closed Testing (Android)
+    Waitlist: coming soon
 
-Waitlist: coming soon
-Feedback channel: GitHub Discussions or a Google Form
+    Feedback: GitHub Discussions or a Google Form
+
 🗺️ Roadmap (high level)
 
     v0.1: Search, details, contact
@@ -154,15 +204,31 @@ Feedback channel: GitHub Discussions or a Google Form
 
     v0.5: Payments readiness (escrow pathways research)
 
+Data & MLS Backbone (parallel track)
+
+    listing.v1, agent.v1, savedSearch.v1, savedHome.v1
+
+    versioning strategy, de-dup rules, provenance/KYC fields
+
+    geospatial indexing & tiles, EN/Tagalog i18n
+
+    See docs/schemas/ and docs/api/ (placeholders OK until merged)
+
 🤝 Contributing
 
-Domana is currently private during MVP.
-If you want to help later, email hello@bertuso.com with your GitHub and what you’d like to work on.
+Private during MVP.
+If you want to help later, email hello@bertuso.com
+
+with your GitHub and what you’d like to work on.
 🧭 Repo Hygiene
 
-    Protect main branch and require PRs
+    Protect main and require PRs
 
-    Conventional commits for clarity: feat:, fix:, docs:, chore:
+    Required checks: lint, test, typecheck
+
+    Conventional commits: feat:, fix:, docs:, chore:
+
+    Pin Node (e.g., .nvmrc) and package manager version
 
     Keep README accurate to reality. Update on every major change
 
@@ -173,4 +239,4 @@ All rights reserved © 2025 The Bertuso Company
 
     Company: https://bertuso.com
 
-    App: https://domana.app
+App: https://domana.app
