@@ -13,15 +13,13 @@ type Mutation =
   | { id: string; op: "updateSearch"; payload: { id: string; patch: Partial<SavedSearch> }; ts: number }
   | { id: string; op: "removeSearch"; payload: { id: string }; ts: number };
 
-const SYNC_ENABLED = false; // flip when backend sync is ready
+const SYNC_ENABLED = false;
 
 type SavedState = {
   homes: Record<string, SavedHome>;
   searches: Record<string, SavedSearch>;
-
   queue: Mutation[];
 
-  // homes
   addHome: (home: SavedHome) => void;
   removeHome: (listingId: string) => void;
   toggleHome: (listingId: string) => void;
@@ -31,7 +29,6 @@ type SavedState = {
   setHomeArchived: (listingId: string, archived: boolean) => void;
   setHomeSnapshot: (listingId: string, snap: SavedHomeSnapshot) => void;
 
-  // searches
   addSearch: (s: SavedSearch) => void;
   updateSearch: (id: string, patch: Partial<SavedSearch>) => void;
   removeSearch: (id: string) => void;
@@ -63,16 +60,8 @@ export const useSavedStore = create(
 
       toggleHome: (listingId) => {
         const exists = !!get().homes[listingId];
-        if (exists) {
-          get().removeHome(listingId);
-        } else {
-          get().addHome({
-            listingId,
-            createdAt: new Date().toISOString(),
-            tags: [],
-            userNoteCount: 0,
-          });
-        }
+        if (exists) get().removeHome(listingId);
+        else get().addHome({ listingId, createdAt: new Date().toISOString(), tags: [], userNoteCount: 0 });
       },
 
       setHomeNoteCount: (listingId, count) => set((state) => {
@@ -120,7 +109,7 @@ export const useSavedStore = create(
         const cur = state.searches[id]; if (!cur) return state;
         const nextS = { ...state.searches, [id]: { ...cur, ...patch } };
         if (patch.name) track("saved_search_rename", { id });
-        if (patch.isArchived !== undefined) track(patch.isArchived ? "saved_search_archive" : "saved_search_archive", { id, archived: patch.isArchived });
+        if (patch.isArchived !== undefined) track(patch.isArchived ? "saved_search_archive" : "saved_search_unarchive", { id, archived: patch.isArchived });
         return enqueue({ ...state, searches: nextS }, { id, op: "updateSearch", payload: { id, patch }, ts: Date.now() });
       }),
 
@@ -134,18 +123,13 @@ export const useSavedStore = create(
       name: "domana:saved",
       version: 2,
       storage: createJSONStorage(() => AsyncStorage),
-      migrate: async (persisted: any, _version) => {
-        // bring forward homes/searches; import old hearts if any
+      migrate: async (persisted: any) => {
         const homes = await migrateOldHearts((persisted?.state?.homes) ?? persisted?.homes ?? {});
         const searches = (persisted?.state?.searches) ?? persisted?.searches ?? {};
         const queue: Mutation[] = [];
         return { state: { homes, searches, queue } } as any;
       },
-      partialize: (state) => ({
-        homes: state.homes,
-        searches: state.searches,
-        // queue intentionally not persisted for now
-      }),
+      partialize: (state) => ({ homes: state.homes, searches: state.searches }),
     }
   )
 );

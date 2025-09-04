@@ -1,6 +1,5 @@
 ﻿import NetInfo from "@react-native-community/netinfo";
 import { useEffect, useState } from "react";
-
 export function useOnline() {
   const [isOnline, setOnline] = useState(true);
   useEffect(() => {
@@ -11,7 +10,7 @@ export function useOnline() {
       const online = !(s.isInternetReachable === false || s.type === "none" || s.type === "unknown");
       setOnline(online);
     });
-    return () => sub && sub();
+    return () => { if (typeof sub === "function") sub(); };
   }, []);
   return isOnline;
 }

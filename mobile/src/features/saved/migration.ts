@@ -1,18 +1,10 @@
 ﻿import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { SavedHome } from "./types";
 
-const CANDIDATE_KEYS = [
-  "domana:hearts",
-  "domana:favorites",
-  "domana:heartMap",
-  "domana:savedHomes",
-  "domana:likedHomes",
-];
-
+const CANDIDATE_KEYS = ["domana:hearts","domana:favorites","domana:heartMap","domana:savedHomes","domana:likedHomes"];
 type HeartMap = Record<string, boolean>;
 type IdList = string[];
-
-function nowISO() { return new Date().toISOString(); }
+const nowISO = () => new Date().toISOString();
 
 export async function migrateOldHearts(existing: Record<string, SavedHome>) {
   const already = new Set(Object.keys(existing ?? {}));
@@ -51,13 +43,9 @@ export async function migrateOldHearts(existing: Record<string, SavedHome>) {
     if (imported > 0 && usedKeys.length > 0) {
       try { await AsyncStorage.multiRemove(usedKeys); } catch {}
     }
-
-    // eslint-disable-next-line no-console
     console.log(`[Phase9 Migration] imported=${imported}, fromKeys=${JSON.stringify(usedKeys)}`);
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.log("[Phase9 Migration] error", e);
   }
-
   return homes;
 }

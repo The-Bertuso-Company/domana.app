@@ -9,29 +9,14 @@ export function isSaved(listingId: string): boolean {
 export function saveWithSnapshot(listingId: string, snapshot?: SavedHomeSnapshot) {
   const s = useSavedStore.getState();
   if (s.homes[listingId]) return;
-  s.addHome({
-    listingId,
-    createdAt: new Date().toISOString(),
-    tags: [],
-    userNoteCount: 0,
-    snapshot,
-  });
+  s.addHome({ listingId, createdAt: new Date().toISOString(), tags: [], userNoteCount: 0, snapshot });
   if (snapshot) track("saved_home_snapshot_capture", { listingId });
 }
 
 export function toggleSaved(listingId: string, snapshot?: SavedHomeSnapshot) {
   const s = useSavedStore.getState();
-  if (s.homes[listingId]) {
-    s.removeHome(listingId);
-  } else {
-    s.addHome({
-      listingId,
-      createdAt: new Date().toISOString(),
-      tags: [],
-      userNoteCount: 0,
-      snapshot,
-    });
-  }
+  if (s.homes[listingId]) s.removeHome(listingId);
+  else s.addHome({ listingId, createdAt: new Date().toISOString(), tags: [], userNoteCount: 0, snapshot });
 }
 
 export function refreshSnapshot(listingId: string, patch: SavedHomeSnapshot) {

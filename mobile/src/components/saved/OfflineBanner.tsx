@@ -1,6 +1,5 @@
 ﻿import { View, Text } from "react-native";
 import { useOnline } from "../../lib/net";
-
 export function OfflineBanner() {
   const isOnline = useOnline();
   if (isOnline) return null;

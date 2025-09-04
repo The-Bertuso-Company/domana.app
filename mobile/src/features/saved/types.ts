@@ -1,21 +1,21 @@
 ﻿export type Tag = string;
 
 export interface SavedHomeSnapshot {
-  price?: number;          // list price in currency units
+  price?: number;
   beds?: number;
   baths?: number;
   sqft?: number;
   yearBuilt?: number;
-  addressLine?: string;    // "123 Main St, City"
-  verifiedTier?: number;   // 0=unknown, 1..3 increasing trust
+  addressLine?: string;
+  verifiedTier?: number;
   reduced?: boolean;
-  distanceKm?: number;     // optional, if known relative to user/map center
+  distanceKm?: number;
 }
 
 export interface SavedHome {
   listingId: string;
-  createdAt: string;           // ISO
-  lastSeenAt?: string;         // ISO
+  createdAt: string;
+  lastSeenAt?: string;
   source?: "list" | "detail" | "share";
   isArchived?: boolean;
   tags?: Tag[];
@@ -26,13 +26,10 @@ export interface SavedHome {
 export interface SavedSearch {
   id: string;
   name: string;
-  createdAt: string;           // ISO
-  lastRunAt?: string;          // ISO
-  params: Record<string, unknown>; // filters/sort/bounds/etc.
+  createdAt: string;
+  lastRunAt?: string;
+  params: Record<string, unknown>;
   resultsCount?: number;
-  notifySettings?: {
-    priceDrop?: boolean;
-    newMatches?: boolean;
-  };
+  notifySettings?: { priceDrop?: boolean; newMatches?: boolean; };
   isArchived?: boolean;
 }
