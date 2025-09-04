@@ -74,3 +74,38 @@ init().catch((err) => {
   process.exit(1);
 });
 
+/** DEBUG: remove after fix */
+import { URL as __URL } from "node:url";
+import * as net from "node:net";
+
+app.get("/__debug/db", async (req, res) => {
+  try {
+    const url = process.env.DATABASE_URL || "";
+    const u = new __URL(url);
+    const host = u.hostname || "127.0.0.1";
+    const port = +(u.port || 5432);
+
+    // quick TCP check (no TLS/PG protocol): succeeds if we can open a socket
+    await new Promise<void>((resolve, reject) => {
+      const s = net.createConnection({ host, port });
+      const t = setTimeout(() => { s.destroy(); reject(new Error("tcp timeout")); }, 3000);
+      s.once("connect", () => { clearTimeout(t); s.destroy(); resolve(); });
+      s.once("error", (e) => { clearTimeout(t); reject(e); });
+    });
+
+    res.json({
+      ok: true,
+      urlLen: url.length,
+      urlHead: url.slice(0, 40),
+      host, port,
+      note: "TCP connect ok from server process",
+    });
+  } catch (e: any) {
+    res.status(500).json({
+      ok: false,
+      message: String(e?.message || e),
+      urlLen: (process.env.DATABASE_URL || "").length,
+      urlHead: (process.env.DATABASE_URL || "").slice(0, 40),
+    });
+  }
+});

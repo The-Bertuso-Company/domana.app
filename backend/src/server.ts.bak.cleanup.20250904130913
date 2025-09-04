@@ -74,3 +74,23 @@ init().catch((err) => {
   process.exit(1);
 });
 
+const t = setTimeout(() => { s.destroy(); reject(new Error("tcp timeout")); }, 3000);
+      s.once("connect", () => { clearTimeout(t); s.destroy(); resolve(); });
+      s.once("error", (e) => { clearTimeout(t); reject(e); });
+
+    res.json({
+      ok: true,
+      urlLen: url.length,
+      urlHead: url.slice(0, 40),
+      host, port,
+      note: "TCP connect ok from server process",
+    });
+  } catch (e: any) {
+    res.status(500).json({
+      ok: false,
+      message: String(e?.message || e),
+      urlLen: (process.env.DATABASE_URL || "").length,
+      urlHead: (process.env.DATABASE_URL || "").slice(0, 40),
+    });
+  }
+});
