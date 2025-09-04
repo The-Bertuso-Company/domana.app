@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from "react";
+﻿import React, { useMemo, useState, useRef, useEffect } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View, Alert } from "react-native";
 import type { Listing } from "../../types/listing";
 import type { ListingTrust, TrustLevel } from "../../types/trust";
@@ -6,17 +6,25 @@ import { useTrustByListingId } from "../../hooks/useTrustByListingId";
 import { track } from "../../lib/analytics";
 
 const COLORS: Record<TrustLevel, string> = {
-  UNVERIFIED: "#9ca3af",     // gray
-  CLAIMED: "#3b82f6",        // blue
-  VERIFIED_BASIC: "#10b981", // green
-  VERIFIED_FULL: "#f59e0b",  // amber
+  UNVERIFIED: "#9ca3af",
+  CLAIMED: "#3b82f6",
+  VERIFIED_BASIC: "#10b981",
+  VERIFIED_FULL: "#f59e0b",
 };
 
-export function TrustBlock({ listing }: { listing: Listing }) {
+export function TrustBlock({ listing, onReadyY }: { listing: Listing; onReadyY?: (y: number) => void }) {
   const { data, isLoading, isError, refetch } = useTrustByListingId(listing.id);
   const [open, setOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [reportText, setReportText] = useState("");
+
+  const wrapRef = useRef<View>(null);
+  useEffect(() => {
+    const t = setTimeout(() => {
+      wrapRef.current?.measure?.((x, y, w, h, px, py) => onReadyY?.(py));
+    }, 150);
+    return () => clearTimeout(t);
+  }, [onReadyY]);
 
   const trust = data;
   const level: TrustLevel = trust?.level || "UNVERIFIED";
@@ -55,7 +63,7 @@ export function TrustBlock({ listing }: { listing: Listing }) {
   }
 
   return (
-    <View style={styles.wrap}>
+    <View ref={wrapRef} onLayout={() => {}} style={styles.wrap}>
       <Text style={styles.sectionTitle}>Trust & Provenance</Text>
 
       <View style={styles.row}>

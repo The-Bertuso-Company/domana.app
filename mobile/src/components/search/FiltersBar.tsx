@@ -4,9 +4,10 @@ import { Chip } from "../ui/Chip";
 import { useSearchStore } from "../../store/useSearchStore";
 import FiltersSheet from "./FiltersSheet";
 import { peso } from "../../utils/currency";
+import { track } from "../../utils/analytics";
 
 export default function FiltersBar() {
-  const { filters } = useSearchStore();
+  const { filters, drawMode, setDrawMode, polygon, setPolygon, clearVertices } = useSearchStore();
   const openRef = useRef<(tab?: "price" | "beds" | "baths" | "type" | "all") => void>(()=>{});
 
   const priceLabel = useMemo(() => {
@@ -42,8 +43,11 @@ export default function FiltersBar() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 8 }}
+        contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 8, alignItems: "center" }}
       >
+        <Chip label={drawMode ? "Drawing…" : "Draw"} onPress={() => { const next = !drawMode; setDrawMode(next); if (next) clearVertices(); track("draw_toggled", { on: next }); }} active={drawMode} />
+        {polygon ? <Chip label="Clear area" onPress={() => { setPolygon(null); track("draw_cleared"); }} /> : null}
+
         <Chip label={priceLabel} onPress={() => openRef.current("price")} active={!!(filters as any).priceMin || !!(filters as any).priceMax} />
         <Chip label={bedsLabel} onPress={() => openRef.current("beds")} active={!!(filters as any).beds} />
         <Chip label={bathsLabel} onPress={() => openRef.current("baths")} active={!!(filters as any).baths} />

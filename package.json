@@ -1,11 +1,24 @@
 {
-  "name": "@domana/root",
+  "name": "domana-mobile",
+  "version": "0.0.1",
   "private": true,
-  "version": "0.0.0",
+  "license": "UNLICENSED",
   "scripts": {
-    "dev:mobile": "pnpm --filter mobile start",
-    "dev:backend": "pnpm --filter backend dev",
-    "dev:frontend": "pnpm --filter frontend dev",
-    "build:all": "pnpm -r build"
+    "api:dev": "ts-node-dev --respawn --transpile-only --prefer-ts-exts api/server.ts",
+    "migrate": "node ops/migrate/run_migrations.js",
+    "bootstrap:owner": "node ops/init/bootstrap_owner.js",
+    "routes": "node -e \"console.log({ routes: require('express-list-endpoints')(require('./api/server').default || require('./api/server')) })\""
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "pg": "^8.11.5"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.7",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.5",
+    "express-list-endpoints": "^7.0.0"
   }
 }

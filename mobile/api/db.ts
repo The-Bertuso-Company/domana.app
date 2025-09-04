@@ -1,25 +1,14 @@
-﻿import "dotenv/config";
-import { Pool, PoolClient, QueryResult } from "pg";
+﻿// C:\Users\Sage\domana\mobile\api\db.ts
+import { Pool } from "pg";
 
-const url = process.env.DATABASE_URL || "";
-const pool = new Pool({
-  connectionString: url,
-  ssl: { rejectUnauthorized: false }, // Supabase + corp TLS safe
+/** Local-friendly defaults; env wins if set */
+export const pool = new Pool({
+  host: process.env.PGHOST || "127.0.0.1",
+  port: Number(process.env.PGPORT || 5432),
+  user: process.env.PGUSER || "domana",
+  password: process.env.PGPASSWORD || "domana",
+  database: process.env.PGDATABASE || "domanadev",
+  application_name: "domana-api",
 });
 
-const cryptoKey = process.env.APP_CRYPTO_KEY ?? "";
-
-pool.on("connect", (client: PoolClient) => {
-  client.query("SET application_name = $1", ["domana-api"]).catch(()=>{});
-  if (cryptoKey) {
-    client.query("SET app.crypto_key = $1", [cryptoKey]).catch(e=>{
-      console.error("SET app.crypto_key failed:", e.message);
-    });
-  }
-});
-
-export async function sql<T=any>(text: string, params: any[] = []): Promise<T[]> {
-  const r: QueryResult = await pool.query(text, params);
-  return r.rows as T[];
-}
-export { pool };
+// No custom SETs here — we pass crypto key as a SQL parameter where needed.

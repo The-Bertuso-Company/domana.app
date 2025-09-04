@@ -1,29 +1,17 @@
-﻿import React from "react";
-import { Pressable, Text, ViewStyle } from "react-native";
+﻿import { Text, View, ViewProps } from "react-native";
+import { useTheme } from "../../providers/ThemeProvider";
 
-export function Chip({
-  label,
-  onPress,
-  active = false,
-  style,
-}: { label: string; onPress?: () => void; active?: boolean; style?: ViewStyle }) {
+export function Chip({ children, style, ...rest }: ViewProps & { children: string }) {
+  const t = useTheme();
   return (
-    <Pressable
-      onPress={onPress}
+    <View
+      {...rest}
       style={[
-        {
-          paddingHorizontal: 12,
-          paddingVertical: 8,
-          borderRadius: 999,
-          borderWidth: 1,
-          borderColor: active ? "#D32F2F" : "#ddd",
-          backgroundColor: active ? "#FBE9E7" : "#fff",
-          marginRight: 8,
-        },
-        style,
+        { paddingVertical: 6, paddingHorizontal: 10, borderRadius: t.radius.xl ?? t.radius.lg, backgroundColor: t.colors.surface, borderWidth: 1, borderColor: t.colors.border },
+        style
       ]}
     >
-      <Text style={{ fontWeight: "600", color: active ? "#B71C1C" : "#222" }}>{label}</Text>
-    </Pressable>
+      <Text style={{ color: t.colors.muted, fontWeight: "600" }}>{children}</Text>
+    </View>
   );
 }

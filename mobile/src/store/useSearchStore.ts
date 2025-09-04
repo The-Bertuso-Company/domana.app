@@ -3,18 +3,24 @@ import type { Bounds, Filters, Sort, Listing } from "../types/listing";
 
 type Status = "idle" | "loading" | "error" | "success";
 
+type LatLon = { lat: number; lon: number };
+
 type State = {
-  center: { lat: number; lon: number } | null;
+  center: LatLon | null;
   zoom: number;
   bounds: Bounds | null;
   filters: Filters;
   sort: Sort;
-  polygon: any | null;
+  polygon: any | null;                 // GeoJSON Polygon
   results: Listing[];
   selectedId: string | null;
   hoverId: string | null;
   status: Status;
   error: string | null;
+
+  // draw mode
+  drawMode: boolean;
+  vertices: LatLon[];
 };
 
 type Actions = {
@@ -29,6 +35,13 @@ type Actions = {
   setSelectedId: (id: string | null) => void;
   setHoverId: (id: string | null) => void;
   setError: (e: string | null) => void;
+
+  // draw actions
+  setDrawMode: (on: boolean) => void;
+  addVertex: (v: LatLon) => void;
+  undoVertex: () => void;
+  clearVertices: () => void;
+
   reset: () => void;
 };
 
@@ -45,6 +58,9 @@ export const useSearchStore = create<State & Actions>((set) => ({
   status: "idle",
   error: null,
 
+  drawMode: false,
+  vertices: [],
+
   setCenter: (center) => set({ center }),
   setZoom: (zoom) => set({ zoom }),
   setBounds: (bounds) => set({ bounds }),
@@ -56,6 +72,11 @@ export const useSearchStore = create<State & Actions>((set) => ({
   setSelectedId: (selectedId) => set({ selectedId }),
   setHoverId: (hoverId) => set({ hoverId }),
   setError: (error) => set({ error }),
+
+  setDrawMode: (on) => set((s) => ({ drawMode: on, vertices: on ? s.vertices : s.vertices })), // keep vertices if toggled accidentally
+  addVertex: (v) => set((s) => ({ vertices: s.vertices.length >= 100 ? s.vertices : [...s.vertices, v] })),
+  undoVertex: () => set((s) => ({ vertices: s.vertices.slice(0, -1) })),
+  clearVertices: () => set({ vertices: [] }),
 
   reset: () =>
     set({
@@ -70,5 +91,7 @@ export const useSearchStore = create<State & Actions>((set) => ({
       hoverId: null,
       status: "idle",
       error: null,
+      drawMode: false,
+      vertices: [],
     }),
 }));

@@ -4,6 +4,7 @@ import { View, Text, TextInput, Pressable } from "react-native";
 import { useSearchStore } from "../../store/useSearchStore";
 import { normalizeFilters, type Filters } from "../../schemas/filters";
 import { saveFilters } from "../../utils/filterPersist";
+import { track } from "../../utils/analytics";
 
 type Tab = "price" | "beds" | "baths" | "type" | "all";
 
@@ -35,31 +36,21 @@ export default function FiltersSheet({ openRef }: { openRef: React.MutableRefObj
     });
     setFilters(next);
     await saveFilters(next);
+    track("filters_applied", {
+      hasPrice: !!(next.priceMin || next.priceMax),
+      beds: next.beds ?? 0,
+      baths: next.baths ?? 0,
+      typeCount: next.propertyType?.length ?? 0,
+    });
     sheetRef.current?.close();
   };
 
   const reset = async () => {
-    setPriceMin("");
-    setPriceMax("");
-    setBeds(0);
-    setBaths(0);
-    setTypes([]);
+    setPriceMin(""); setPriceMax(""); setBeds(0); setBaths(0); setTypes([]);
     setFilters({});
     await saveFilters({});
+    track("filters_reset");
   };
-
-  const Toggle = ({ value, set, label }: any) => (
-    <Pressable
-      onPress={() => set(value)}
-      style={{
-        paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10,
-        borderWidth: 1, borderColor: "#ddd", marginRight: 8,
-        backgroundColor: (value && value !== 0) ? "#F1F1F1" : "#fff"
-      }}
-    >
-      <Text style={{ fontWeight: "600" }}>{label}</Text>
-    </Pressable>
-  );
 
   const Pill = ({ selected, onPress, label }: any) => (
     <Pressable
@@ -84,7 +75,7 @@ export default function FiltersSheet({ openRef }: { openRef: React.MutableRefObj
   return (
     <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} enablePanDownToClose>
       <BottomSheetScrollView contentContainerStyle={{ padding: 16 }}>
-        {/* Tabs (visual hint only) */}
+        {/* Tabs */}
         <View style={{ flexDirection: "row", marginBottom: 12 }}>
           {(["all","price","beds","baths","type"] as Tab[]).map((t) => (
             <Pill key={t} selected={tab===t} onPress={() => setTab(t)} label={t.toUpperCase()} />
@@ -96,23 +87,13 @@ export default function FiltersSheet({ openRef }: { openRef: React.MutableRefObj
             <View style={{ flexDirection: "row", gap: 12 }}>
               <View style={{ flex: 1 }}>
                 <Text style={{ marginBottom: 6 }}>Min</Text>
-                <TextInput
-                  keyboardType="number-pad"
-                  value={priceMin}
-                  onChangeText={setPriceMin}
-                  placeholder="e.g. 2000000"
-                  style={{ borderWidth: 1, borderColor: "#ddd", borderRadius: 10, padding: 10 }}
-                />
+                <TextInput keyboardType="number-pad" value={priceMin} onChangeText={setPriceMin} placeholder="e.g. 2000000"
+                  style={{ borderWidth: 1, borderColor: "#ddd", borderRadius: 10, padding: 10 }} />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={{ marginBottom: 6 }}>Max</Text>
-                <TextInput
-                  keyboardType="number-pad"
-                  value={priceMax}
-                  onChangeText={setPriceMax}
-                  placeholder="e.g. 8000000"
-                  style={{ borderWidth: 1, borderColor: "#ddd", borderRadius: 10, padding: 10 }}
-                />
+                <TextInput keyboardType="number-pad" value={priceMax} onChangeText={setPriceMax} placeholder="e.g. 8000000"
+                  style={{ borderWidth: 1, borderColor: "#ddd", borderRadius: 10, padding: 10 }} />
               </View>
             </View>
           </Section>

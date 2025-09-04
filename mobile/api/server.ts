@@ -4,36 +4,41 @@ import { pool } from "./db";
 import { apiKeyAuth } from "./middleware/auth";
 
 const app = express();
-app.use(express.json());
+app.disable("x-powered-by");
+app.use(express.json({ limit: "1mb" }));
 
 const CRYPTO_KEY = process.env.APP_CRYPTO_KEY || "localdev-secret";
+
+/* --- simple http health --- */
+app.get("/health/http", (_req, res) => res.json({ ok: true }));
 
 /* === Health: DB === */
 app.get("/health/db", async (_req, res) => {
   try {
-    const r = await pool.query("select 1 as ok");
-    res.json({ ok: r.rows[0]?.ok === 1 });
+    const r = await pool.query("SELECT 1 AS ok");
+    return res.json({ ok: r.rows[0]?.ok === 1 });
   } catch (e: any) {
-    res.status(500).json({ ok: false, error: e?.message || String(e) });
+    return res.status(500).json({ ok: false, error: e?.message || String(e) });
   }
 });
 
 /* === Health: Crypto (pgcrypto direct) === */
 app.get("/health/crypto", async (_req, res) => {
   try {
+    // exact signature check; returns null if pgcrypto isn't installed
     const have = await pool.query(
-      "select to_regprocedure('pgp_sym_encrypt(text,text)') is not null as ok"
+      `SELECT to_regprocedure('pgp_sym_encrypt(text, text)') IS NOT NULL AS ok`
     );
     if (!have.rows[0]?.ok) {
       return res.status(500).json({ ok: false, error: "pgcrypto not installed" });
     }
     const r = await pool.query(
-      "select pgp_sym_decrypt(pgp_sym_encrypt('ok',$1), $1)='ok' as ok",
+      `SELECT pgp_sym_decrypt(pgp_sym_encrypt('ok',$1), $1)='ok' AS ok`,
       [CRYPTO_KEY]
     );
-    res.json({ ok: !!r.rows[0]?.ok });
+    return res.json({ ok: !!r.rows[0]?.ok });
   } catch (e: any) {
-    res.status(500).json({ ok: false, error: e?.message || String(e) });
+    return res.status(500).json({ ok: false, error: e?.message || String(e) });
   }
 });
 
@@ -47,7 +52,11 @@ app.get("/v1/listings", async (req, res) => {
   const where: string[] = [];
   const params: any[] = [];
   let i = 1;
-  const add = (sql: string, v: any) => { where.push(sql.replace(/\$\d+/g, `$${i}`)); params.push(v); i++; };
+  const add = (sql: string, v: any) => {
+    where.push(sql.replace(/\$\d+/g, `$${i}`));
+    params.push(v);
+    i++;
+  };
 
   if (q.status)        add("status = $1::listing_status", q.status);
   if (q.intent)        add("intent = $1::listing_intent", q.intent);
@@ -59,7 +68,8 @@ app.get("/v1/listings", async (req, res) => {
   if (q.search) {
     const s = `%${q.search}%`;
     where.push(`(address_text ILIKE $${i} OR city ILIKE $${i} OR province ILIKE $${i})`);
-    params.push(s); i++;
+    params.push(s);
+    i++;
   }
 
   const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
@@ -76,9 +86,9 @@ app.get("/v1/listings", async (req, res) => {
   `;
   try {
     const r = await pool.query(sql, params);
-    res.json({ page, limit, items: r.rows });
+    return res.json({ page, limit, items: r.rows });
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -87,7 +97,7 @@ app.get("/v1/owners/:id", apiKeyAuth, async (req, res) => {
   const id = req.params.id;
   try {
     const r = await pool.query(
-      "select id, full_name_or_entity, contact_email, contact_phone from owner where id=$1",
+      "SELECT id, full_name_or_entity, contact_email, contact_phone FROM owner WHERE id=$1",
       [id]
     );
     if (r.rows.length) return res.json(r.rows[0]);
@@ -96,10 +106,9 @@ app.get("/v1/owners/:id", apiKeyAuth, async (req, res) => {
       return res.status(500).json({ error: "owner_error", detail: e?.message || String(e) });
     }
   }
-
   try {
     const r2 = await pool.query(
-      "select id, full_name_or_entity, contact_email, contact_phone from owner_secure where id=$1",
+      "SELECT id, full_name_or_entity, contact_email, contact_phone FROM owner_secure WHERE id=$1",
       [id]
     );
     if (r2.rows.length) return res.json(r2.rows[0]);
@@ -117,9 +126,9 @@ app.get("/v1/listings/:id/media", async (req, res) => {
          FROM media WHERE listing_id=$1 ORDER BY sort_order, created_at`,
       [req.params.id]
     );
-    res.json({ items: r.rows });
+    return res.json({ items: r.rows });
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -132,9 +141,9 @@ app.post("/v1/listings/:id/media", apiKeyAuth, async (req, res) => {
        RETURNING *`,
       [req.params.id, b.kind, b.url, b.width, b.height, b.sort_order ?? 0, JSON.stringify(b.meta ?? {})]
     );
-    res.status(201).json(r.rows[0]);
+    return res.status(201).json(r.rows[0]);
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -148,9 +157,9 @@ app.get("/v1/saved-searches", async (req, res) => {
        ORDER BY updated_at DESC`,
       [actor]
     );
-    res.json({ items: r.rows });
+    return res.json({ items: r.rows });
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -163,9 +172,9 @@ app.post("/v1/saved-searches", apiKeyAuth, async (req, res) => {
        RETURNING *`,
       [b.actor_id, b.name ?? null, JSON.stringify(b.params ?? {}), !!b.is_alert, b.cadence]
     );
-    res.status(201).json(r.rows[0]);
+    return res.status(201).json(r.rows[0]);
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -181,9 +190,9 @@ app.get("/v1/saved-homes", async (req, res) => {
         ORDER BY sh.updated_at DESC`,
       [actor]
     );
-    res.json({ items: r.rows });
+    return res.json({ items: r.rows });
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -192,24 +201,24 @@ app.post("/v1/saved-homes", apiKeyAuth, async (req, res) => {
   try {
     const r = await pool.query(
       `INSERT INTO saved_home (actor_id, listing_id, note, tags)
-       VALUES ($1,$2,$3,$4)
+       VALUES ($1,$2,$3,$4::text[])
        ON CONFLICT (actor_id, listing_id)
        DO UPDATE SET note=EXCLUDED.note, tags=EXCLUDED.tags, updated_at=now()
        RETURNING *`,
       [b.actor_id, b.listing_id, b.note ?? null, b.tags ?? []]
     );
-    res.status(201).json(r.rows[0]);
+    return res.status(201).json(r.rows[0]);
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
 app.delete("/v1/saved-homes/:id", apiKeyAuth, async (req, res) => {
   try {
     await pool.query(`DELETE FROM saved_home WHERE id=$1`, [req.params.id]);
-    res.json({ ok: true });
+    return res.json({ ok: true });
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -222,9 +231,9 @@ app.post("/v1/threads", apiKeyAuth, async (req, res) => {
        VALUES ($1,$2,$3) RETURNING *`,
       [b.subject ?? null, b.created_by, b.listing_id ?? null]
     );
-    res.status(201).json(r.rows[0]);
+    return res.status(201).json(r.rows[0]);
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -234,9 +243,9 @@ app.get("/v1/threads/:id/messages", async (req, res) => {
       `SELECT * FROM message WHERE thread_id=$1 ORDER BY sent_at`,
       [req.params.id]
     );
-    res.json({ items: r.rows });
+    return res.json({ items: r.rows });
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -248,9 +257,9 @@ app.post("/v1/threads/:id/messages", apiKeyAuth, async (req, res) => {
        VALUES ($1,$2,$3) RETURNING *`,
       [req.params.id, b.sender, b.body]
     );
-    res.status(201).json(r.rows[0]);
+    return res.status(201).json(r.rows[0]);
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -268,7 +277,8 @@ app.get("/v1/tours", apiKeyAuth, async (req, res) => {
   let i = 1;
   const add = (sql: string, v: any) => {
     where.push(sql.replace(/\$\d+/g, `$${i}`));
-    params.push(v); i++;
+    params.push(v);
+    i++;
   };
 
   if (q.created_by) add("created_by = $1", q.created_by);
@@ -287,9 +297,9 @@ app.get("/v1/tours", apiKeyAuth, async (req, res) => {
 
   try {
     const r = await pool.query(sql, params);
-    res.json({ page, limit, items: r.rows });
+    return res.json({ page, limit, items: r.rows });
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -312,9 +322,9 @@ app.post("/v1/tours", apiKeyAuth, async (req, res) => {
        RETURNING *`,
       [createdBy, status, start, notes],
     );
-    res.status(201).json(r.rows[0]);
+    return res.status(201).json(r.rows[0]);
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -327,9 +337,9 @@ app.get("/v1/tours/:id", async (req, res) => {
       `SELECT * FROM tour_stop WHERE tour_id=$1 ORDER BY order_num, created_at`,
       [req.params.id],
     );
-    res.json({ tour: t.rows[0], stops: s.rows });
+    return res.json({ tour: t.rows[0], stops: s.rows });
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -349,9 +359,9 @@ app.patch("/v1/tours/:id", apiKeyAuth, async (req, res) => {
       [req.params.id, b.status ?? null, start, b.notes ?? null],
     );
     if (!r.rows.length) return res.status(404).json({ error: "not_found" });
-    res.json(r.rows[0]);
+    return res.json(r.rows[0]);
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -378,13 +388,12 @@ app.post("/v1/tours/:id/status", apiKeyAuth, async (req, res) => {
       [req.params.id, ns, setsEnd],
     );
     if (!r.rows.length) return res.status(404).json({ error: "not_found" });
-    res.json(r.rows[0]);
+    return res.json(r.rows[0]);
   } catch (e: any) {
-    // Surface the DB reason (e.g., check constraint) so we can see the exact rule text
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    // Surface DB reason (e.g., check constraint) so we can see the exact rule text
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
-
 
 /* Create stop (validates tour + listing; auto order if missing) */
 app.post("/v1/tours/:id/stops", apiKeyAuth, async (req, res) => {
@@ -416,9 +425,9 @@ app.post("/v1/tours/:id/stops", apiKeyAuth, async (req, res) => {
        RETURNING *`,
       [tourId, b.listing_id, order, b.eta ?? null],
     );
-    res.status(201).json(r.rows[0]);
+    return res.status(201).json(r.rows[0]);
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -435,9 +444,9 @@ app.patch("/v1/tours/:id/stops/:stopId", apiKeyAuth, async (req, res) => {
       [req.params.id, req.params.stopId, req.body?.order_num ?? null, req.body?.eta ?? null],
     );
     if (!r.rows.length) return res.status(404).json({ error: "not_found" });
-    res.json(r.rows[0]);
+    return res.json(r.rows[0]);
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -457,9 +466,9 @@ app.post("/v1/tours/:id/stops/resequence", apiKeyAuth, async (req, res) => {
        RETURNING t.*`,
       [req.params.id],
     );
-    res.json({ items: r.rows });
+    return res.json({ items: r.rows });
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -471,9 +480,9 @@ app.delete("/v1/tours/:id/stops/:stopId", apiKeyAuth, async (req, res) => {
       [req.params.stopId, req.params.id],
     );
     if (!r.rows.length) return res.status(404).json({ error: "not_found" });
-    res.json({ ok: true, id: r.rows[0].id });
+    return res.json({ ok: true, id: r.rows[0].id });
   } catch (e: any) {
-    res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
+    return res.status(400).json({ error: "bad_request", detail: e?.message || String(e) });
   }
 });
 
@@ -503,9 +512,9 @@ END $$;
        WHERE table_schema='public' AND table_name='tour' AND column_name='row_version'
     `);
 
-    res.json({ ok: true, column: chk.rows[0] || null });
+    return res.json({ ok: true, column: chk.rows[0] || null });
   } catch (e: any) {
-    res.status(500).json({ ok: false, error: e?.message || String(e) });
+    return res.status(500).json({ ok: false, error: e?.message || String(e) });
   }
 });
 
@@ -525,12 +534,12 @@ app.get("/dev/db/tour-status-allowed", apiKeyAuth, async (_req, res) => {
       // Try patterns: IN ('a','b',...) OR ARRAY['a','b',...]
       const m = def.match(/\((?:status\s*IN\s*)\((.*?)\)\)/) || def.match(/ARRAY\[(.*?)\]/);
       if (m?.[1]) {
-        allowed = m[1].split(",").map(s => s.replace(/::[a-z_]+/gi,"").replace(/'/g,"").trim());
+        allowed = m[1].split(",").map(s => s.replace(/::[a-z_]+/gi, "").replace(/'/g, "").trim());
       }
     }
-    res.json({ def, allowed });
+    return res.json({ def, allowed });
   } catch (e: any) {
-    res.status(500).json({ error: "inspect_error", detail: e?.message || String(e) });
+    return res.status(500).json({ error: "inspect_error", detail: e?.message || String(e) });
   }
 });
 
@@ -586,27 +595,58 @@ app.post("/dev/db/bootstrap-phase4", apiKeyAuth, async (_req, res) => {
         (SELECT to_regclass('public.tour_stop') IS NOT NULL) AS have_tour_stop,
         (SELECT to_regclass('public.listing') IS NOT NULL) AS have_listing
     `);
-    res.json({ ok: true, bootstrap: r.rows[0] });
+    return res.json({ ok: true, bootstrap: r.rows[0] });
   } catch (e: any) {
-    res.status(500).json({ ok: false, error: e?.message || String(e) });
+    return res.status(500).json({ ok: false, error: e?.message || String(e) });
   }
 });
 
 /* === Vector tiles (MVT) === */
 app.get("/v1/tiles/:z/:x/:y.mvt", async (req, res) => {
   try {
-    const { z, x, y } = req.params;
+    const z = Number(req.params.z);
+    const x = Number(req.params.x);
+    const y = Number(req.params.y);
+    if (![z, x, y].every(Number.isInteger) || z < 0 || z > 22) {
+      return res.status(400).json({ error: "bad_request", detail: "invalid tile coordinates" });
+    }
     const r = await pool.query(
       `SELECT tile_listings($1::int,$2::int,$3::int) AS mvt`,
       [z, x, y]
     );
-    res.type("application/vnd.mapbox-vector-tile").send(r.rows[0].mvt);
+    const buf = r.rows[0]?.mvt;
+    if (!buf) return res.status(204).end();
+    res.setHeader("Content-Type", "application/vnd.mapbox-vector-tile");
+    res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=120");
+    return res.send(buf);
   } catch (e: any) {
-    res.status(500).json({ error: "tile_error", detail: e?.message || String(e) });
+    return res.status(500).json({ error: "tile_error", detail: e?.message || String(e) });
   }
 });
 
+/* --- 404 fallthrough --- */
+app.use((_req, res) => res.status(404).json({ error: "not_found" }));
+
+/* --- global error handler --- */
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  const status = typeof err?.status === "number" ? err.status : 500;
+  const message = err?.message || "InternalError";
+  return res.status(status).json({ error: "internal_error", detail: message });
+});
+
+/* --- start --- */
 const port = Number(process.env.PORT || 4000);
-app.listen(port, () => console.log(`Domana API listening on http://localhost:${port}`));
+const server = app.listen(port, () => {
+  console.log(`Domana API listening on http://localhost:${port}`);
+});
+
+/* helpful: surface pg pool errors & allow graceful shutdown */
+pool.on("error", (e) => {
+  console.error("Postgres pool error:", e?.message || e);
+});
+process.on("SIGINT", async () => {
+  try { await pool.end(); } catch {}
+  server.close(() => process.exit(0));
+});
 
 export default app;

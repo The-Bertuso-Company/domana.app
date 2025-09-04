@@ -3,10 +3,11 @@
   return {
     presets: ["babel-preset-expo"],
     plugins: [
-      ["module-resolver", {
+      [require.resolve("babel-plugin-module-resolver"), {
         alias: { "@": "./" },
         extensions: [".ts", ".tsx", ".js", ".jsx", ".json"]
-      }]
+      }],
+      "react-native-reanimated/plugin"
     ]
   };
 };

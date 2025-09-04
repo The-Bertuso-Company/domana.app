@@ -1,0 +1,196 @@
+diff --git a/node_modules/@expo/cli/build/src/export/embed/exportEmbedAsync.js b/node_modules/@expo/cli/build/src/export/embed/exportEmbedAsync.js
+index 40f8bab..886bfee 100644
+--- a/node_modules/@expo/cli/build/src/export/embed/exportEmbedAsync.js
++++ b/node_modules/@expo/cli/build/src/export/embed/exportEmbedAsync.js
+@@ -1,5 +1,5 @@
+-/**
+- * Copyright © 2023 650 Industries.
++﻿/**
++ * Copyright Â© 2023 650 Industries.
+  *
+  * This source code is licensed under the MIT license found in the
+  * LICENSE file in the root directory of this source tree.
+@@ -66,21 +66,21 @@ function _glob() {
+     return data;
+ }
+ function _Server() {
+-    const data = /*#__PURE__*/ _interop_require_default(require("metro/src/Server"));
++    const data = /*#__PURE__*/ _interop_require_default(require('metro/private/'));
+     _Server = function() {
+         return data;
+     };
+     return data;
+ }
+ function _splitBundleOptions() {
+-    const data = /*#__PURE__*/ _interop_require_default(require("metro/src/lib/splitBundleOptions"));
++    const data = /*#__PURE__*/ _interop_require_default(require('metro/private/'));
+     _splitBundleOptions = function() {
+         return data;
+     };
+     return data;
+ }
+ function _bundle() {
+-    const data = /*#__PURE__*/ _interop_require_default(require("metro/src/shared/output/bundle"));
++    const data = /*#__PURE__*/ _interop_require_default(require('metro/private/'));
+     _bundle = function() {
+         return data;
+     };
+diff --git a/node_modules/@expo/cli/build/src/start/server/metro/MetroBundlerDevServer.js b/node_modules/@expo/cli/build/src/start/server/metro/MetroBundlerDevServer.js
+index 193cd60..2dfe8e1 100644
+--- a/node_modules/@expo/cli/build/src/start/server/metro/MetroBundlerDevServer.js
++++ b/node_modules/@expo/cli/build/src/start/server/metro/MetroBundlerDevServer.js
+@@ -1,5 +1,5 @@
+-/**
+- * Copyright © 2022 650 Industries.
++﻿/**
++ * Copyright Â© 2022 650 Industries.
+  *
+  * This source code is licensed under the MIT license found in the
+  * LICENSE file in the root directory of this source tree.
+@@ -49,28 +49,28 @@ function _chalk() {
+     return data;
+ }
+ function _baseJSBundle() {
+-    const data = /*#__PURE__*/ _interop_require_default(require("metro/src/DeltaBundler/Serializers/baseJSBundle"));
++    const data = /*#__PURE__*/ _interop_require_default(require('metro/private/'));
+     _baseJSBundle = function() {
+         return data;
+     };
+     return data;
+ }
+ function _sourceMapGenerator() {
+-    const data = require("metro/src/DeltaBundler/Serializers/sourceMapGenerator");
++    const data = require('metro/private/');
+     _sourceMapGenerator = function() {
+         return data;
+     };
+     return data;
+ }
+ function _bundleToString() {
+-    const data = /*#__PURE__*/ _interop_require_default(require("metro/src/lib/bundleToString"));
++    const data = /*#__PURE__*/ _interop_require_default(require('metro/private/lib/bundleToString'));
+     _bundleToString = function() {
+         return data;
+     };
+     return data;
+ }
+ function _getGraphId() {
+-    const data = /*#__PURE__*/ _interop_require_default(require("metro/src/lib/getGraphId"));
++    const data = /*#__PURE__*/ _interop_require_default(require('metro/private/'));
+     _getGraphId = function() {
+         return data;
+     };
+@@ -1357,3 +1357,4 @@ function unique(array) {
+ }
+ 
+ //# sourceMappingURL=MetroBundlerDevServer.js.map
++
+diff --git a/node_modules/@expo/cli/build/src/start/server/metro/TerminalReporter.js b/node_modules/@expo/cli/build/src/start/server/metro/TerminalReporter.js
+index 38c75be..1bdbaf9 100644
+--- a/node_modules/@expo/cli/build/src/start/server/metro/TerminalReporter.js
++++ b/node_modules/@expo/cli/build/src/start/server/metro/TerminalReporter.js
+@@ -1,4 +1,4 @@
+-// This file represents an abstraction on the metro TerminalReporter.
++﻿// This file represents an abstraction on the metro TerminalReporter.
+ // We use this abstraction to safely extend the TerminalReporter for our own custom logging.
+ "use strict";
+ Object.defineProperty(exports, "__esModule", {
+@@ -29,7 +29,7 @@ function _chalk() {
+     return data;
+ }
+ function _TerminalReporter() {
+-    const data = /*#__PURE__*/ _interop_require_default(require("metro/src/lib/TerminalReporter"));
++    const data = /*#__PURE__*/ _interop_require_default(require("metro/private/lib/TerminalReporter"));
+     _TerminalReporter = function() {
+         return data;
+     };
+diff --git a/node_modules/@expo/cli/build/src/start/server/metro/getCssModulesFromBundler.js b/node_modules/@expo/cli/build/src/start/server/metro/getCssModulesFromBundler.js
+index 4989315..a6ed431 100644
+--- a/node_modules/@expo/cli/build/src/start/server/metro/getCssModulesFromBundler.js
++++ b/node_modules/@expo/cli/build/src/start/server/metro/getCssModulesFromBundler.js
+@@ -1,4 +1,4 @@
+-"use strict";
++﻿"use strict";
+ Object.defineProperty(exports, "__esModule", {
+     value: true
+ });
+@@ -24,14 +24,14 @@ function _crypto() {
+     return data;
+ }
+ function _js() {
+-    const data = require("metro/src/DeltaBundler/Serializers/helpers/js.js");
++    const data = require('metro/private/');
+     _js = function() {
+         return data;
+     };
+     return data;
+ }
+ function _splitBundleOptions() {
+-    const data = /*#__PURE__*/ _interop_require_default(require("metro/src/lib/splitBundleOptions"));
++    const data = /*#__PURE__*/ _interop_require_default(require('metro/private/'));
+     _splitBundleOptions = function() {
+         return data;
+     };
+diff --git a/node_modules/@expo/cli/build/src/start/server/metro/instantiateMetro.js b/node_modules/@expo/cli/build/src/start/server/metro/instantiateMetro.js
+index 816d3be..f2ee0d2 100644
+--- a/node_modules/@expo/cli/build/src/start/server/metro/instantiateMetro.js
++++ b/node_modules/@expo/cli/build/src/start/server/metro/instantiateMetro.js
+@@ -1,4 +1,4 @@
+-"use strict";
++﻿"use strict";
+ Object.defineProperty(exports, "__esModule", {
+     value: true
+ });
+@@ -48,14 +48,14 @@ function _chalk() {
+     return data;
+ }
+ function _RevisionNotFoundError() {
+-    const data = /*#__PURE__*/ _interop_require_default(require("metro/src/IncrementalBundler/RevisionNotFoundError"));
++    const data = /*#__PURE__*/ _interop_require_default(require('metro/private/'));
+     _RevisionNotFoundError = function() {
+         return data;
+     };
+     return data;
+ }
+ function _formatBundlingError() {
+-    const data = /*#__PURE__*/ _interop_require_default(require("metro/src/lib/formatBundlingError"));
++    const data = /*#__PURE__*/ _interop_require_default(require('metro/private/'));
+     _formatBundlingError = function() {
+         return data;
+     };
+@@ -299,7 +299,7 @@ async function instantiateMetroAsync(metroBundler, options, { isExporting, exp =
+         } catch  {
+             // Add fallback for monorepo tests up until the fork is merged.
+             _log.Log.warn('Failed to load HMR serializer from @expo/metro-config, using fallback version.');
+-            hmrJSBundle = require('metro/src/DeltaBundler/Serializers/hmrJSBundle');
++            hmrJSBundle = require('metro/private/');
+         }
+         // Patch HMR Server to send more info to the `_createModuleId` function for deterministic module IDs and add support for serializing HMR updates the same as all other bundles.
+         hmrServer._prepareMessage = async function(group, options, changeEvent) {
+diff --git a/node_modules/@expo/cli/build/src/start/server/metro/runServer-fork.js b/node_modules/@expo/cli/build/src/start/server/metro/runServer-fork.js
+index 842b1c7..206f043 100644
+--- a/node_modules/@expo/cli/build/src/start/server/metro/runServer-fork.js
++++ b/node_modules/@expo/cli/build/src/start/server/metro/runServer-fork.js
+@@ -1,4 +1,4 @@
+-// Copyright © 2023 650 Industries.
++﻿// Copyright Â© 2023 650 Industries.
+ // Copyright (c) Meta Platforms, Inc. and affiliates.
+ //
+ // Forks https://github.com/facebook/metro/blob/b80d9a0f638ee9fb82ff69cd3c8d9f4309ca1da2/packages/metro/src/index.flow.js#L57
+@@ -42,14 +42,14 @@ function _metro() {
+     return data;
+ }
+ function _HmrServer() {
+-    const data = /*#__PURE__*/ _interop_require_default(require("metro/src/HmrServer"));
++    const data = /*#__PURE__*/ _interop_require_default(require('metro/private/'));
+     _HmrServer = function() {
+         return data;
+     };
+     return data;
+ }
+ function _createWebsocketServer() {
+-    const data = /*#__PURE__*/ _interop_require_default(require("metro/src/lib/createWebsocketServer"));
++    const data = /*#__PURE__*/ _interop_require_default(require('metro/private/'));
+     _createWebsocketServer = function() {
+         return data;
+     };

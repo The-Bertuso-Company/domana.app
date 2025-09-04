@@ -1,19 +1,41 @@
-﻿import { PropsWithChildren, useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+﻿// mobile/src/providers/QueryProvider.tsx
+import React, { useEffect } from "react";
+import { AppState } from "react-native";
+import NetInfo from "@react-native-community/netinfo";
+import {
+  QueryClient,
+  QueryClientProvider,
+  focusManager,
+  onlineManager,
+} from "@tanstack/react-query";
 
-export function QueryProvider({ children }: PropsWithChildren) {
-  const [client] = useState(() =>
-    new QueryClient({
-      defaultOptions: {
-        queries: {
-          staleTime: 60_000,
-          retry: 1,
-          refetchOnWindowFocus: false,
-        },
-        mutations: { retry: 0 },
-      },
-    })
-  );
+const client = new QueryClient();
 
-  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+function AppStateBridge() {
+  useEffect(() => {
+    // Focus manager (foreground / background)
+    const sub = AppState.addEventListener("change", (state) =>
+      focusManager.setFocused(state === "active")
+    );
+    return () => sub.remove();
+  }, []);
+
+  useEffect(() => {
+    // Online manager (network up/down)
+    const unsub = NetInfo.addEventListener((s) =>
+      onlineManager.setOnline(!!s.isConnected)
+    );
+    return () => unsub();
+  }, []);
+
+  return null;
 }
+
+export const QueryProvider = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <QueryClientProvider client={client}>
+      <AppStateBridge />
+      {children}
+    </QueryClientProvider>
+  );
+};

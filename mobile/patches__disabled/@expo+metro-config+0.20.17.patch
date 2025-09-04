@@ -1,0 +1,296 @@
+diff --git a/node_modules/@expo/metro-config/build/ExpoMetroConfig.js b/node_modules/@expo/metro-config/build/ExpoMetroConfig.js
+index 4d7d39d..ed4c80e 100644
+--- a/node_modules/@expo/metro-config/build/ExpoMetroConfig.js
++++ b/node_modules/@expo/metro-config/build/ExpoMetroConfig.js
+@@ -1,4 +1,4 @@
+-"use strict";
++﻿"use strict";
+ var __importDefault = (this && this.__importDefault) || function (mod) {
+     return (mod && mod.__esModule) ? mod : { "default": mod };
+ };
+@@ -32,7 +32,7 @@ let hasWarnedAboutExotic = false;
+ // Patch Metro's graph to support always parsing certain modules. This enables
+ // things like Tailwind CSS which update based on their own heuristics.
+ function patchMetroGraphToSupportUncachedModules() {
+-    const { Graph } = require('metro/src/DeltaBundler/Graph');
++    const { Graph } = require('metro/private/');
+     const original_traverseDependencies = Graph.prototype.traverseDependencies;
+     if (!original_traverseDependencies.__patched) {
+         original_traverseDependencies.__patched = true;
+diff --git a/node_modules/@expo/metro-config/build/file-store.js b/node_modules/@expo/metro-config/build/file-store.js
+index 6beb698..1ee6b48 100644
+--- a/node_modules/@expo/metro-config/build/file-store.js
++++ b/node_modules/@expo/metro-config/build/file-store.js
+@@ -1,10 +1,10 @@
+-"use strict";
++﻿"use strict";
+ var __importDefault = (this && this.__importDefault) || function (mod) {
+     return (mod && mod.__esModule) ? mod : { "default": mod };
+ };
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.FileStore = void 0;
+-const FileStore_1 = __importDefault(require("metro-cache/src/stores/FileStore"));
++const FileStore_1 = __importDefault(require('metro-cache').FileStore);
+ const debug = require('debug')('expo:metro:cache');
+ class FileStore extends FileStore_1.default {
+     async set(key, value) {
+@@ -18,3 +18,4 @@ class FileStore extends FileStore_1.default {
+ }
+ exports.FileStore = FileStore;
+ //# sourceMappingURL=file-store.js.map
++
+diff --git a/node_modules/@expo/metro-config/build/serializer/environmentVariableSerializerPlugin.js b/node_modules/@expo/metro-config/build/serializer/environmentVariableSerializerPlugin.js
+index 02ca410..e657221 100644
+--- a/node_modules/@expo/metro-config/build/serializer/environmentVariableSerializerPlugin.js
++++ b/node_modules/@expo/metro-config/build/serializer/environmentVariableSerializerPlugin.js
+@@ -1,4 +1,4 @@
+-"use strict";
++﻿"use strict";
+ var __importDefault = (this && this.__importDefault) || function (mod) {
+     return (mod && mod.__esModule) ? mod : { "default": mod };
+ };
+@@ -7,8 +7,8 @@ exports.getTransformEnvironment = getTransformEnvironment;
+ exports.serverPreludeSerializerPlugin = serverPreludeSerializerPlugin;
+ exports.environmentVariableSerializerPlugin = environmentVariableSerializerPlugin;
+ exports.getEnvVarDevString = getEnvVarDevString;
+-const CountingSet_1 = __importDefault(require("metro/src/lib/CountingSet"));
+-const countLines_1 = __importDefault(require("metro/src/lib/countLines"));
++const CountingSet_1 = __importDefault(require('metro/private/'));
++const countLines_1 = __importDefault(require('metro/private/'));
+ const debug = require('debug')('expo:metro-config:serializer:env-var');
+ function getTransformEnvironment(url) {
+     const match = url.match(/[&?]transform\.environment=([^&]+)/);
+diff --git a/node_modules/@expo/metro-config/build/serializer/fork/baseJSBundle.js b/node_modules/@expo/metro-config/build/serializer/fork/baseJSBundle.js
+index b61ed2c..f36a344 100644
+--- a/node_modules/@expo/metro-config/build/serializer/fork/baseJSBundle.js
++++ b/node_modules/@expo/metro-config/build/serializer/fork/baseJSBundle.js
+@@ -1,6 +1,6 @@
+-"use strict";
++﻿"use strict";
+ /**
+- * Copyright © 2022 650 Industries.
++ * Copyright Â© 2022 650 Industries.
+  * Copyright (c) Meta Platforms, Inc. and affiliates.
+  *
+  * This source code is licensed under the MIT license found in the
+@@ -18,9 +18,9 @@ exports.getBaseUrlOption = getBaseUrlOption;
+ exports.baseJSBundle = baseJSBundle;
+ exports.baseJSBundleWithDependencies = baseJSBundleWithDependencies;
+ const jsc_safe_url_1 = require("jsc-safe-url");
+-const CountingSet_1 = __importDefault(require("metro/src/lib/CountingSet"));
+-const countLines_1 = __importDefault(require("metro/src/lib/countLines"));
+-const getAppendScripts_1 = __importDefault(require("metro/src/lib/getAppendScripts"));
++const CountingSet_1 = __importDefault(require('metro/private/'));
++const countLines_1 = __importDefault(require('metro/private/'));
++const getAppendScripts_1 = __importDefault(require('metro/private/'));
+ const processModules_1 = require("./processModules");
+ function getPlatformOption(graph, options) {
+     if (graph.transformOptions?.platform != null) {
+diff --git a/node_modules/@expo/metro-config/build/serializer/getCssDeps.js b/node_modules/@expo/metro-config/build/serializer/getCssDeps.js
+index 06d62ec..888702c 100644
+--- a/node_modules/@expo/metro-config/build/serializer/getCssDeps.js
++++ b/node_modules/@expo/metro-config/build/serializer/getCssDeps.js
+@@ -1,4 +1,4 @@
+-"use strict";
++﻿"use strict";
+ var __importDefault = (this && this.__importDefault) || function (mod) {
+     return (mod && mod.__esModule) ? mod : { "default": mod };
+ };
+@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.getCssSerialAssets = getCssSerialAssets;
+ exports.fileNameFromContents = fileNameFromContents;
+ exports.getFileName = getFileName;
+-const js_js_1 = require("metro/src/DeltaBundler/Serializers/helpers/js.js");
++const js_js_1 = require('metro/private/');
+ const path_1 = __importDefault(require("path"));
+ const css_1 = require("../transform-worker/css");
+ const filePath_1 = require("../utils/filePath");
+diff --git a/node_modules/@expo/metro-config/build/serializer/reconcileTransformSerializerPlugin.js b/node_modules/@expo/metro-config/build/serializer/reconcileTransformSerializerPlugin.js
+index e56f3f3..d03fdfd 100644
+--- a/node_modules/@expo/metro-config/build/serializer/reconcileTransformSerializerPlugin.js
++++ b/node_modules/@expo/metro-config/build/serializer/reconcileTransformSerializerPlugin.js
+@@ -1,4 +1,4 @@
+-"use strict";
++﻿"use strict";
+ var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+     if (k2 === undefined) k2 = k;
+     var desc = Object.getOwnPropertyDescriptor(m, k);
+@@ -40,15 +40,15 @@ exports.sortDependencies = sortDependencies;
+ exports.isEnvBoolean = isEnvBoolean;
+ exports.reconcileTransformSerializerPlugin = reconcileTransformSerializerPlugin;
+ /**
+- * Copyright © 2024 650 Industries.
++ * Copyright Â© 2024 650 Industries.
+  *
+  * This source code is licensed under the MIT license found in the
+  * LICENSE file in the root directory of this source tree.
+  */
+ const generator_1 = __importDefault(require("@babel/generator"));
+ const assert_1 = __importDefault(require("assert"));
+-const JsFileWrapping_1 = __importDefault(require("metro/src/ModuleGraph/worker/JsFileWrapping"));
+-const importLocationsPlugin_1 = require("metro/src/ModuleGraph/worker/importLocationsPlugin");
++const JsFileWrapping_1 = __importDefault(require('metro/private/'));
++const importLocationsPlugin_1 = require('metro/private/');
+ const metro_source_map_1 = require("metro-source-map");
+ const metro_transform_plugins_1 = __importDefault(require("metro-transform-plugins"));
+ const node_util_1 = __importDefault(require("node:util"));
+diff --git a/node_modules/@expo/metro-config/build/serializer/serializeChunks.js b/node_modules/@expo/metro-config/build/serializer/serializeChunks.js
+index fa62130..0065c51 100644
+--- a/node_modules/@expo/metro-config/build/serializer/serializeChunks.js
++++ b/node_modules/@expo/metro-config/build/serializer/serializeChunks.js
+@@ -1,4 +1,4 @@
+-"use strict";
++﻿"use strict";
+ var __importDefault = (this && this.__importDefault) || function (mod) {
+     return (mod && mod.__esModule) ? mod : { "default": mod };
+ };
+@@ -7,14 +7,14 @@ exports.Chunk = void 0;
+ exports.graphToSerialAssetsAsync = graphToSerialAssetsAsync;
+ exports.getSortedModules = getSortedModules;
+ /**
+- * Copyright © 2023 650 Industries.
++ * Copyright Â© 2023 650 Industries.
+  *
+  * This source code is licensed under the MIT license found in the
+  * LICENSE file in the root directory of this source tree.
+  */
+ const assert_1 = __importDefault(require("assert"));
+-const sourceMapString_1 = __importDefault(require("metro/src/DeltaBundler/Serializers/sourceMapString"));
+-const bundleToString_1 = __importDefault(require("metro/src/lib/bundleToString"));
++const sourceMapString_1 = __importDefault(require('metro-source-map').sourceMapString);
++const bundleToString_1 = __importDefault(require('metro/private/lib/bundleToString'));
+ const path_1 = __importDefault(require("path"));
+ const debugId_1 = require("./debugId");
+ const exportHermes_1 = require("./exportHermes");
+@@ -537,3 +537,6 @@ function getSortedModules(modules, { createModuleId, }) {
+     return modules.sort((a, b) => createModuleId(a.path) - createModuleId(b.path));
+ }
+ //# sourceMappingURL=serializeChunks.js.map
++
++
++
+diff --git a/node_modules/@expo/metro-config/build/serializer/withExpoSerializers.js b/node_modules/@expo/metro-config/build/serializer/withExpoSerializers.js
+index f0ec0bc..c5ce3bf 100644
+--- a/node_modules/@expo/metro-config/build/serializer/withExpoSerializers.js
++++ b/node_modules/@expo/metro-config/build/serializer/withExpoSerializers.js
+@@ -1,4 +1,4 @@
+-"use strict";
++﻿"use strict";
+ var __importDefault = (this && this.__importDefault) || function (mod) {
+     return (mod && mod.__esModule) ? mod : { "default": mod };
+ };
+@@ -8,14 +8,14 @@ exports.withSerializerPlugins = withSerializerPlugins;
+ exports.createDefaultExportCustomSerializer = createDefaultExportCustomSerializer;
+ exports.createSerializerFromSerialProcessors = createSerializerFromSerialProcessors;
+ /**
+- * Copyright © 2022 650 Industries.
++ * Copyright Â© 2022 650 Industries.
+  *
+  * This source code is licensed under the MIT license found in the
+  * LICENSE file in the root directory of this source tree.
+  */
+ const jsc_safe_url_1 = require("jsc-safe-url");
+-const sourceMapString_1 = __importDefault(require("metro/src/DeltaBundler/Serializers/sourceMapString"));
+-const bundleToString_1 = __importDefault(require("metro/src/lib/bundleToString"));
++const sourceMapString_1 = __importDefault(require('metro-source-map').sourceMapString);
++const bundleToString_1 = __importDefault(require('metro/private/lib/bundleToString'));
+ const debugId_1 = require("./debugId");
+ const environmentVariableSerializerPlugin_1 = require("./environmentVariableSerializerPlugin");
+ const baseJSBundle_1 = require("./fork/baseJSBundle");
+@@ -253,3 +253,6 @@ function unwrapOriginalSerializer(serializer) {
+     return serializer.__originalSerializer;
+ }
+ //# sourceMappingURL=withExpoSerializers.js.map
++
++
++
+diff --git a/node_modules/@expo/metro-config/build/transform-worker/asset-transformer.js b/node_modules/@expo/metro-config/build/transform-worker/asset-transformer.js
+index 73e8953..9f346ad 100644
+--- a/node_modules/@expo/metro-config/build/transform-worker/asset-transformer.js
++++ b/node_modules/@expo/metro-config/build/transform-worker/asset-transformer.js
+@@ -1,4 +1,4 @@
+-"use strict";
++﻿"use strict";
+ var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+     if (k2 === undefined) k2 = k;
+     var desc = Object.getOwnPropertyDescriptor(m, k);
+@@ -49,7 +49,7 @@ exports.transform = transform;
+  */
+ const template_1 = __importDefault(require("@babel/template"));
+ const t = __importStar(require("@babel/types"));
+-const util_1 = require("metro/src/Bundler/util");
++const util_1 = require('metro/private/');
+ const node_path_1 = __importDefault(require("node:path"));
+ const node_url_1 = __importDefault(require("node:url"));
+ const getAssets_1 = require("./getAssets");
+diff --git a/node_modules/@expo/metro-config/build/transform-worker/getAssets.js b/node_modules/@expo/metro-config/build/transform-worker/getAssets.js
+index eddcbe4..870df64 100644
+--- a/node_modules/@expo/metro-config/build/transform-worker/getAssets.js
++++ b/node_modules/@expo/metro-config/build/transform-worker/getAssets.js
+@@ -1,12 +1,12 @@
+-"use strict";
++﻿"use strict";
+ var __importDefault = (this && this.__importDefault) || function (mod) {
+     return (mod && mod.__esModule) ? mod : { "default": mod };
+ };
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.getUniversalAssetData = getUniversalAssetData;
+ exports.default = getAssets;
+-const Assets_1 = require("metro/src/Assets");
+-const js_js_1 = require("metro/src/DeltaBundler/Serializers/helpers/js.js");
++const Assets_1 = require('metro/private/');
++const js_js_1 = require('metro/private/');
+ const node_crypto_1 = __importDefault(require("node:crypto"));
+ const node_fs_1 = __importDefault(require("node:fs"));
+ const node_path_1 = __importDefault(require("node:path"));
+diff --git a/node_modules/@expo/metro-config/build/transform-worker/metro-transform-worker.js b/node_modules/@expo/metro-config/build/transform-worker/metro-transform-worker.js
+index 8142bd7..c571761 100644
+--- a/node_modules/@expo/metro-config/build/transform-worker/metro-transform-worker.js
++++ b/node_modules/@expo/metro-config/build/transform-worker/metro-transform-worker.js
+@@ -1,4 +1,4 @@
+-"use strict";
++﻿"use strict";
+ var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+     if (k2 === undefined) k2 = k;
+     var desc = Object.getOwnPropertyDescriptor(m, k);
+@@ -56,9 +56,9 @@ const generator_1 = __importDefault(require("@babel/generator"));
+ const babylon = __importStar(require("@babel/parser"));
+ const template_1 = __importDefault(require("@babel/template"));
+ const t = __importStar(require("@babel/types"));
+-const JsFileWrapping_1 = __importDefault(require("metro/src/ModuleGraph/worker/JsFileWrapping"));
+-const generateImportNames_1 = __importDefault(require("metro/src/ModuleGraph/worker/generateImportNames"));
+-const importLocationsPlugin_1 = require("metro/src/ModuleGraph/worker/importLocationsPlugin");
++const JsFileWrapping_1 = __importDefault(require('metro/private/'));
++const generateImportNames_1 = __importDefault(require('metro/private/'));
++const importLocationsPlugin_1 = require('metro/private/');
+ const metro_cache_1 = require("metro-cache");
+ const metro_cache_key_1 = __importDefault(require("metro-cache-key"));
+ const metro_source_map_1 = require("metro-source-map");
+@@ -244,7 +244,7 @@ function performConstantFolding(ast, { filename }) {
+         sourceMaps: false,
+         // NOTE(kitten): In Metro, this is also false, but only works because the prior run of `transformFromAstSync` was always
+         // running with `cloneInputAst: true`.
+-        // This isn't needed anymore since `clearProgramScopePlugin` re-crawls the AST’s scope instead.
++        // This isn't needed anymore since `clearProgramScopePlugin` re-crawls the ASTâ€™s scope instead.
+         cloneInputAst: false,
+     }).ast);
+     return ast;
+diff --git a/node_modules/@expo/metro-config/build/transform-worker/transform-worker.js b/node_modules/@expo/metro-config/build/transform-worker/transform-worker.js
+index 75cb042..1472d5c 100644
+--- a/node_modules/@expo/metro-config/build/transform-worker/transform-worker.js
++++ b/node_modules/@expo/metro-config/build/transform-worker/transform-worker.js
+@@ -1,4 +1,4 @@
+-"use strict";
++﻿"use strict";
+ /**
+  * Copyright 2023-present 650 Industries (Expo). All rights reserved.
+  * Copyright (c) Meta Platforms, Inc. and affiliates.
+@@ -44,7 +44,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
+ };
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.transform = transform;
+-const countLines_1 = __importDefault(require("metro/src/lib/countLines"));
++const countLines_1 = __importDefault(require('metro/private/'));
+ const node_path_1 = require("node:path");
+ const css_1 = require("./css");
+ const css_modules_1 = require("./css-modules");

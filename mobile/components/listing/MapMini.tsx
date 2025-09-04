@@ -2,6 +2,7 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import type { Listing } from "../../types/listing";
 import { useRouter } from "expo-router";
+import { track } from "../../lib/analytics";
 
 const TOKEN = process.env.EXPO_PUBLIC_MAPBOX_TOKEN;
 
@@ -24,7 +25,7 @@ export function MapMini({ listing }: { listing: Listing }) {
     <View style={styles.wrap}>
       <Text style={styles.title}>Location</Text>
       <Pressable
-        onPress={() => router.push({ pathname: "/(tabs)/search", params: { center: `${listing.latitude},${listing.longitude}`, highlight: listing.id } })}
+        onPress={() => { track("open_map_mini", { listingId: listing.id }); router.push({ pathname: "/(tabs)/search", params: { center: `${listing.latitude},${listing.longitude}`, highlight: listing.id } }); }}
         accessibilityRole="button"
         accessibilityLabel="Open on map"
         style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
