@@ -1,3 +1,2 @@
-﻿import React from 'react';
-import { View, Text } from 'react-native';
-export default function Explore(){ return <View style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>Explore</Text></View>; }
+﻿import { Redirect } from "expo-router";
+export default function ExploreTab(){ return <Redirect href="/explore" />; }
