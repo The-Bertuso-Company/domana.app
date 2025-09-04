@@ -1,12 +1,5 @@
-﻿import { View, Text, Pressable, useColorScheme } from "react-native";
+﻿import { View, Text, Pressable } from "react-native";
 import type { SavedHome } from "../../features/saved/types";
-
-/* --- inline DS theme (auto) --- */
-const __TH_LIGHT = { bg:"#FFFFFF", surface:"#F7F7FA", card:"#FFFFFF", border:"#E6E6EB", text:"#0B0B0F", muted:"#6B6B76", primary:"#E53935" };
-const __TH_DARK  = { bg:"#0B0B0F", surface:"#111217", card:"#151821", border:"#2A2D35", text:"#F2F3F7", muted:"#A3A6AF", primary:"#FF4D4D" };
-function __getTheme(scheme){ return scheme === "dark" ? __TH_DARK : __TH_LIGHT; }
-const __domCard = (th)=>({ backgroundColor: th.card, borderColor: th.border, borderWidth: 1, borderRadius: 12, padding: 12, marginHorizontal: 12, marginVertical: 8 });
-const __domMuted = (th)=>({ color: th.muted });
 
 export function SavedHomeCard({
   home, onPress, onLongPress, selected,
@@ -19,7 +12,6 @@ export function SavedHomeCard({
   const s = home.snapshot;
 
   return (
-    <View style={__domCard(th)}>
     <Pressable onPress={onPress} onLongPress={onLongPress}>
       <View style={{
         padding: 12, borderRadius: 12, borderWidth: selected ? 2 : 1,
@@ -29,13 +21,13 @@ export function SavedHomeCard({
           <Text style={{ fontWeight: "700", fontSize: 16 }}>{s?.price ? `$${s.price.toLocaleString()}` : "Saved home"}</Text>
           {!!s?.verifiedTier && <Text style={{ color: "#0a7" }}>Verified {s.verifiedTier}</Text>}
         </View>
-        <Text style={{ color: "#444", marginTop: 2 }} style={[{ color: "#444", marginTop: 2 , __domMuted(th)]}>
+        <Text style={{ color: "#444", marginTop: 2 }}>
           {s?.beds ?? "—"} bd • {s?.baths ?? "—"} ba • {s?.sqft ? `${s.sqft.toLocaleString()} sqft` : "—"}
         </Text>
         {!!s?.addressLine && <Text style={{ color: "#666", marginTop: 2 }}>{s.addressLine}</Text>}
         <View style={{ flexDirection: "row", gap: 8, marginTop: 6, flexWrap: "wrap" }}>
           {!!home.userNoteCount && <Text>Notes ({home.userNoteCount})</Text>}
-          {!!home.tags?.length && <Text style={[__domMuted(th)]}>Tags: {home.tags.join(", ")}</Text>}
+          {!!home.tags?.length && <Text>Tags: {home.tags.join(", ")}</Text>}
           {!home.userNoteCount && !(home.tags?.length) && <Text style={{ color: "#999" }}>Saved {new Date(home.createdAt).toLocaleDateString()}</Text>}
         </View>
       </View>
