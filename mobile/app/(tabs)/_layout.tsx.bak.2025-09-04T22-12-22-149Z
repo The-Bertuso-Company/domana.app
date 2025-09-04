@@ -1,21 +1,16 @@
 import { Tabs } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useColorScheme } from "react-native";
-import { getTheme } from "../../ui/tokens";
 
 export default function TabLayout() {
   const scheme = useColorScheme();
-  const th = getTheme(scheme as any);
+  const bg = scheme === "dark" ? "#0B0B0F" : "#FFFFFF";
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: th.bg }} edges={["left","right"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: bg }} edges={["left","right"]}>
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarStyle: { backgroundColor: th.surface, borderTopColor: th.border, height: 52 },
-          tabBarActiveTintColor: th.primary,
-          tabBarInactiveTintColor: th.muted,
-          tabBarLabelStyle: { fontSize: 12, fontWeight: "600" },
-          tabBarHideOnKeyboard: true
+          tabBarStyle: { backgroundColor: bg },
         }}
       >
         <Tabs.Screen name="index" options={{ title: "Explore" }} />
@@ -23,6 +18,7 @@ export default function TabLayout() {
         <Tabs.Screen name="sell/index" options={{ title: "Sell" }} />
         <Tabs.Screen name="pro/index" options={{ title: "Pro" }} />
         <Tabs.Screen name="me/index" options={{ title: "Me" }} />
+        {/** dev and saved intentionally omitted from tab bar */}
       </Tabs>
     </SafeAreaView>
   );
