@@ -6,7 +6,7 @@ export default function TabLayout() {
   const scheme = useColorScheme();
   const bg = scheme === "dark" ? "#0B0B0F" : "#FFFFFF";
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: bg }} edges={["left","right"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: bg }} edges={["left","right","bottom"]}>
       <Tabs
         screenOptions={{
           headerShown: false,

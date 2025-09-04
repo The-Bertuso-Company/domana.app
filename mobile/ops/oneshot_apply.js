@@ -96,8 +96,8 @@ select id, full_name_or_entity, contact_email, contact_phone from owner;
 create or replace view owner_public as
 select
   id,
-  case when contact_email is null then null else regexp_replace(contact_email,'(^.).+(@.*$)','\1***\2') end as contact_email,
-  case when contact_phone is null then null else regexp_replace(contact_phone,'(.{0,3}).*(.{2})$','\1****\2') end as contact_phone
+  case when contact_email is null then null else regexp_replace(contact_email,'(^.).+(@.*$)','\\\\***\\\\') end as contact_email,
+  case when contact_phone is null then null else regexp_replace(contact_phone,'(.{0,3}).*(.{2})$','\\\\****\\\\') end as contact_phone
 from owner;
 
 -- crypto helpers (safe if app.crypto_key is not set)
@@ -161,3 +161,4 @@ COMMIT;
     await c.end();
   }
 })();
+

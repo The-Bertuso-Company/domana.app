@@ -16,7 +16,7 @@ const __DomanaBG = ({children}: any) => {
   const scheme = useColorScheme();
   const bg = scheme === "dark" ? "#0B0B0F" : "#FFFFFF";
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: bg }} edges={["top","left","right"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: bg }} edges={["top","bottom","left","right"]}>
       <StatusBar style={scheme === "dark" ? "light" : "dark"} backgroundColor={bg}  animated />
       <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 8 }}>
         {children}
