@@ -15,13 +15,11 @@ const queryClient = new QueryClient();
 /* --- Domana shell baseline wrapper (auto) --- */
 const __DomanaBG = ({children}: any) => {
   const scheme = useColorScheme();
-
-
-
-
     const th = getTheme(scheme as any);
+  const th = getTheme(scheme as any);
   const bg = th.bg;
-return (
+const bg = scheme === "dark" ? "#0B0B0F" : "#FFFFFF";
+  return (
     <SafeAreaView style={{ flex: 1, backgroundColor: bg }} edges={["top","left","right"]}>
       <StatusBar style={scheme === "dark" ? "light" : "dark"} backgroundColor={bg}  animated />
       <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 8 }}>
