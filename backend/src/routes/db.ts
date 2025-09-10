@@ -4,14 +4,13 @@ import { Router } from "express";
 const DATABASE_URL = process.env.DATABASE_URL || "";
 const isPostgres = /^postgres(ql)?:\/\//i.test(DATABASE_URL);
 
-// Lazy-load Prisma ONLY if we actually talk to Postgres
-let prisma: any = null;
-async function ensurePrisma() {
-  if (!prisma) {
-    const mod = await import("@prisma/client");
-    prisma = new mod.PrismaClient();
-  }
-  return prisma;
+// When Postgres is configured, ping it with node-postgres (no Prisma).
+async function pingPostgres(): Promise<void> {
+  const { Client } = await import("pg");
+  const client = new Client({ connectionString: DATABASE_URL });
+  await client.connect();
+  await client.query("SELECT 1");
+  await client.end().catch(() => {});
 }
 
 // 1) Named export expected by server.ts
@@ -21,8 +20,7 @@ export function registerDb(app: Express) {
       return res.status(200).json({ ok: true, driver: "dev-fallback", url: DATABASE_URL });
     }
     try {
-      const p = await ensurePrisma();
-      await p.$queryRaw`SELECT 1`;
+      await pingPostgres();
       return res.json({ ok: true, driver: "postgres" });
     } catch (err: any) {
       return res.status(500).json({ ok: false, error: String(err?.message || err) });
@@ -37,8 +35,7 @@ router.get("/db/ping", async (_req: Request, res: Response) => {
     return res.status(200).json({ ok: true, driver: "dev-fallback", url: DATABASE_URL });
   }
   try {
-    const p = await ensurePrisma();
-    await p.$queryRaw`SELECT 1`;
+    await pingPostgres();
     return res.json({ ok: true, driver: "postgres" });
   } catch (err: any) {
     return res.status(500).json({ ok: false, error: String(err?.message || err) });
