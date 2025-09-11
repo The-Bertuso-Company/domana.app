@@ -1,8 +1,21 @@
-﻿import type { Express, Request, Response } from "express";
-import { Router } from "express";
+﻿const DATABASE_URL = process.env.DATABASE_URL || "";
+const forcedFallback = process.env.FORCE_DB_FALLBACK === "1";
+const computedIsPostgres = /^postgres(ql)?:\/\//i.test(DATABASE_URL);
+const isPostgres = computedIsPostgres && !forcedFallback;
 
-const DATABASE_URL = process.env.DATABASE_URL || "";
-const isPostgres = /^postgres(ql)?:\/\//i.test(DATABASE_URL);
+// tiny helper to respond on Express OR Fastify
+function sendJSON(res: any, code: number, payload: any) {
+  if (res && typeof res.status === "function" && typeof res.json === "function") {
+    return res.status(code).json(payload);              // Express
+  }
+  if (res && typeof res.code === "function" && typeof res.send === "function") {
+    return res.code(code).send(payload);                // Fastify
+  }
+  if (res && typeof res.status === "function" && typeof res.send === "function") {
+    return res.status(code).send(payload);              // Koa-ish/adapters
+  }
+  return res?.send ? res.send(payload) : payload;
+}
 
 // When Postgres is configured, ping it with node-postgres (no Prisma).
 async function pingPostgres(): Promise<void> {
@@ -13,33 +26,20 @@ async function pingPostgres(): Promise<void> {
   await client.end().catch(() => {});
 }
 
-// 1) Named export expected by server.ts
-export function registerDb(app: Express) {
-  app.get("/db/ping", async (_req: Request, res: Response) => {
+// Named export expected by server.ts
+export function registerDb(app: any) {
+  app.get("/db/ping", async (_req: any, res: any) => {
     if (!isPostgres) {
-      return res.status(200).json({ ok: true, driver: "dev-fallback", url: DATABASE_URL });
+      return sendJSON(res, 200, { ok: true, driver: "dev-fallback", url: DATABASE_URL });
     }
     try {
       await pingPostgres();
-      return res.json({ ok: true, driver: "postgres" });
+      return sendJSON(res, 200, { ok: true, driver: "postgres" });
     } catch (err: any) {
-      return res.status(500).json({ ok: false, error: String(err?.message || err) });
+      return sendJSON(res, 500, { ok: false, error: String(err?.message || err) });
     }
   });
 }
 
-// 2) Default router export (kept for flexibility)
-const router = Router();
-router.get("/db/ping", async (_req: Request, res: Response) => {
-  if (!isPostgres) {
-    return res.status(200).json({ ok: true, driver: "dev-fallback", url: DATABASE_URL });
-  }
-  try {
-    await pingPostgres();
-    return res.json({ ok: true, driver: "postgres" });
-  } catch (err: any) {
-    return res.status(500).json({ ok: false, error: String(err?.message || err) });
-  }
-});
-
-export default router;
+// default export is optional; keep a no-op for app.use patterns
+export default { registerDb };
