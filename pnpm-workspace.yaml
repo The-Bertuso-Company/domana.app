@@ -1,5 +1,15 @@
 packages:
-  - 'frontend'
-  - 'backend'
-  - 'mobile'
-  - 'packages/*'
+  - frontend
+  - backend
+  - mobile
+  - packages/*
+
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - '@sentry/cli'
+  - '@tailwindcss/oxide'
+  - esbuild
+  - prisma
+  - sharp
+  - unrs-resolver
