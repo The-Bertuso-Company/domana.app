@@ -38,3 +38,8 @@ frontend/node_modules/
 backups/
 frontend/backups/
 *.zip
+mobile/metro.config.backup.*
+mobile/.expo/
+mobile/.cache/
+mobile/.metro-cache/
+mobile/.turbo/

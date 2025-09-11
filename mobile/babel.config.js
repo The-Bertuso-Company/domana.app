@@ -3,11 +3,7 @@
   return {
     presets: ["babel-preset-expo"],
     plugins: [
-      [require.resolve("babel-plugin-module-resolver"), {
-        alias: { "@": "./" },
-        extensions: [".ts", ".tsx", ".js", ".jsx", ".json"]
-      }],
-      "react-native-reanimated/plugin"
-    ]
+      "react-native-reanimated/plugin", // keep LAST
+    ],
   };
 };
