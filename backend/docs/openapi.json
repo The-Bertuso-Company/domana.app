@@ -1,0 +1,20 @@
+﻿{
+  "openapi": "3.0.3",
+  "info": { "title": "Domana API", "version": "0.1.0" },
+  "servers": [{ "url": "http://localhost:4000" }],
+  "paths": {
+    "/health": { "get": { "responses": { "200": { "description": "OK" } } } },
+    "/status": { "get": { "responses": { "200": { "description": "OK" } } } },
+    "/db/ping": { "get": { "responses": { "200": { "description": "DB OK" } } } },
+    "/v1/listings/nearby": {
+      "get": {
+        "parameters": [
+          { "name": "lat", "in": "query", "required": true, "schema": { "type": "number" } },
+        { "name": "lng", "in": "query", "required": true, "schema": { "type": "number" } },
+          { "name": "radius_km", "in": "query", "required": false, "schema": { "type": "number", "default": 5 } }
+        ],
+        "responses": { "200": { "description": "Nearby listings" } }
+      }
+    }
+  }
+}

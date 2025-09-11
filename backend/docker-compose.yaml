@@ -1,0 +1,20 @@
+﻿services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: domana_db
+    environment:
+      POSTGRES_USER: domana
+      POSTGRES_PASSWORD: domana
+      POSTGRES_DB: domana
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+  redis:
+    image: redis:7
+    container_name: domana_redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server","--appendonly","yes"]
+volumes:
+  db_data:
