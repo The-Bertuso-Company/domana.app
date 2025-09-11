@@ -1,0 +1,19 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://domana.app/schemas/owner.v1.json",
+  "title": "Owner v1",
+  "type": "object",
+  "required": ["id","full_name_or_entity","kyc_status","created_at","updated_at"],
+  "properties": {
+    "id": { "type": "string" },
+    "full_name_or_entity": { "type": "string", "minLength": 1 },
+    "contact_email": { "type": ["string","null"], "format": "email" },
+    "contact_phone": { "type": ["string","null"], "pattern": "^\\+[1-9]\\d{1,14}$" },
+    "address_id": { "type": ["string","null"] },
+    "kyc_status": { "type": "string", "enum": ["unverified","pending","verified","rejected"] },
+    "verified_at": { "type": ["string","null"], "format": "date-time" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}
