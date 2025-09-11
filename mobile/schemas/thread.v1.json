@@ -1,0 +1,33 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://domana.app/schemas/thread.v1.json",
+  "title": "Thread v1",
+  "type": "object",
+  "required": ["id","listing_id","created_by_user_id","participants","created_at","updated_at"],
+  "properties": {
+    "id": { "type": "string" },
+    "listing_id": { "type": "string" },
+    "subject": { "type": ["string","null"] },
+    "created_by_user_id": { "type": "string" },
+    "participants": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["actor_type","actor_id"],
+        "properties": {
+          "actor_type": { "type": "string", "enum": ["user","agent","owner","system"] },
+          "actor_id": { "type": "string" },
+          "mute_notifications": { "type": "boolean", "default": false },
+          "last_read_at": { "type": ["string","null"], "format": "date-time" }
+        },
+        "additionalProperties": false
+      },
+      "uniqueItems": true
+    },
+    "last_message_at": { "type": ["string","null"], "format": "date-time" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

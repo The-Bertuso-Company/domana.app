@@ -1,0 +1,31 @@
+diff --git a/node_modules/metro/src/DeltaBundler/Serializers/sourceMapString.js b/node_modules/metro/src/DeltaBundler/Serializers/sourceMapString.js
+index 7caec46..262db95 100644
+--- a/node_modules/metro/src/DeltaBundler/Serializers/sourceMapString.js
++++ b/node_modules/metro/src/DeltaBundler/Serializers/sourceMapString.js
+@@ -1,21 +1,6 @@
+-"use strict";
++﻿/**
++ * Shim for older deps requiring "metro/src/DeltaBundler/Serializers/sourceMapString".
++ * We re-export from metro-source-map.
++ */
++module.exports = require("metro/src/DeltaBundler/Serializers/sourceMapString");
+ 
+-const {
+-  sourceMapGenerator,
+-  sourceMapGeneratorNonBlocking,
+-} = require("./sourceMapGenerator");
+-function sourceMapString(modules, options) {
+-  return sourceMapGenerator(modules, options).toString(undefined, {
+-    excludeSource: options.excludeSource,
+-  });
+-}
+-async function sourceMapStringNonBlocking(modules, options) {
+-  const generator = await sourceMapGeneratorNonBlocking(modules, options);
+-  return generator.toString(undefined, {
+-    excludeSource: options.excludeSource,
+-  });
+-}
+-module.exports = {
+-  sourceMapString,
+-  sourceMapStringNonBlocking,
+-};

@@ -1,0 +1,23 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://domana.app/schemas/message.v1.json",
+  "title": "Message v1",
+  "type": "object",
+  "required": ["id","thread_id","sender_type","sender_id","body","sent_at"],
+  "properties": {
+    "id": { "type": "string" },
+    "thread_id": { "type": "string" },
+    "sender_type": { "type": "string", "enum": ["user","agent","owner","system"] },
+    "sender_id": { "type": "string" },
+    "body": { "type": "string", "minLength": 1, "maxLength": 5000 },
+    "attachments": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "metadata": { "type": "object", "additionalProperties": true },
+    "sent_at": { "type": "string", "format": "date-time" },
+    "read_at": { "type": ["string","null"], "format": "date-time" }
+  },
+  "additionalProperties": false
+}

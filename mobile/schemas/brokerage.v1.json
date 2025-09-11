@@ -1,0 +1,19 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://domana.app/schemas/brokerage.v1.json",
+  "title": "Brokerage v1",
+  "type": "object",
+  "required": ["id","legal_name","created_at","updated_at"],
+  "properties": {
+    "id": { "type": "string" },
+    "legal_name": { "type": "string", "minLength": 1 },
+    "dba": { "type": ["string","null"] },
+    "tin_or_tax_id": { "type": ["string","null"] },
+    "address_id": { "type": ["string","null"] },
+    "contact_email": { "type": ["string","null"], "format": "email" },
+    "contact_phone": { "type": ["string","null"], "pattern": "^\\+[1-9]\\d{1,14}$" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,30 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://domana.app/schemas/agent.v1.json",
+  "title": "Agent v1",
+  "type": "object",
+  "required": ["id","full_name","license_no","license_expiry","kyc_status","created_at","updated_at"],
+  "properties": {
+    "id": { "type": "string" },
+    "full_name": { "type": "string", "minLength": 1 },
+    "license_no": { "type": "string", "minLength": 3 },
+    "license_expiry": { "type": "string", "format": "date" },
+    "phones": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^\\+[1-9]\\d{1,14}$" },
+      "default": []
+    },
+    "emails": {
+      "type": "array",
+      "items": { "type": "string", "format": "email" },
+      "default": []
+    },
+    "brokerage_id": { "type": ["string","null"] },
+    "address_id": { "type": ["string","null"] },
+    "kyc_status": { "type": "string", "enum": ["unverified","pending","verified","rejected"] },
+    "verified_at": { "type": ["string","null"], "format": "date-time" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}
