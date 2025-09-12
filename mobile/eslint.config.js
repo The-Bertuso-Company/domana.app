@@ -18,6 +18,7 @@ module.exports = [
       'prettier.config.*',
       'metro.config.*',
       'babel.config.*',
+      'app.config.*',
     ],
     languageOptions: {
       parser: tsParser,
@@ -30,7 +31,7 @@ module.exports = [
     },
   },
 
-  // Lint config files with Node globals and CommonJS, but relax no-undef (for __dirname/require)
+  // Lint config files with Node globals (but we still ignore app.config.* globally)
   {
     files: [
       '**/*.config.*',
@@ -48,11 +49,9 @@ module.exports = [
         process: 'readonly',
       },
     },
-    rules: {
-      'no-undef': 'off',
-    },
+    rules: { 'no-undef': 'off' },
   },
 
   // Global ignores
-  { ignores: ['node_modules/**', 'android/**', 'ios/**', '.expo/**'] },
+  { ignores: ['node_modules/**', 'android/**', 'ios/**', '.expo/**', 'app.config.*'] },
 ];
