@@ -1,41 +1,42 @@
 ﻿{
-    "name":  "domana-mobile",
-    "version":  "0.0.1",
-    "private":  true,
-    "main":  "index.js",
-    "scripts":  {
-                    "start":  "expo start",
-                    "android":  "expo run:android",
-                    "ios":  "expo run:ios",
-                    "web":  "expo start --web",
-                    "lint":  "eslint --ext .js,.jsx,.ts,.tsx .",
-                    "format":  "prettier --write .",
-                    "tsc":  "tsc --noEmit"
-                },
-    "dependencies":  {
-                         "expo":  "~51.0.0",
-                         "expo-status-bar":  "~1.12.1",
-                         "react":  "18.2.0",
-                         "react-dom":  "18.2.0",
-                         "react-native":  "0.74.0",
-                         "react-native-web":  "~0.19.10"
-                     },
-    "devDependencies":  {
-                            "@babel/core":  "^7.20.0",
-                            "@react-native-community/eslint-config":  "^3.2.0",
-                            "@typescript-eslint/eslint-plugin":  "^8.43.0",
-                            "@typescript-eslint/parser":  "^8.43.0",
-                            "eslint":  "^9.35.0",
-                            "eslint-config-expo":  "^10.0.0",
-                            "eslint-config-prettier":  "^10.1.8",
-                            "eslint-plugin-prettier":  "^5.5.4",
-                            "eslint-plugin-react":  "^7.37.5",
-                            "eslint-plugin-react-hooks":  "^5.2.0",
-                            "prettier":  "^3.6.2",
-                            "typescript":  "~5.4.5"
-                        },
-    "engines":  {
-                    "node":  "20.x",
-                    "pnpm":  "9.x"
-                }
+  "name": "domana-mobile",
+  "version": "0.0.1",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "lint": "eslint . --config ./eslint.config.js --max-warnings=0",
+    "format": "prettier --config ./prettier.config.cjs --write .",
+    "tsc": "tsc --noEmit"
+  },
+  "dependencies": {
+    "expo": "~51.0.0",
+    "expo-status-bar": "~1.12.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-native": "0.74.0",
+    "react-native-web": "~0.19.10"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@eslint/eslintrc": "^3.3.1",
+    "@react-native-community/eslint-config": "^3.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.43.0",
+    "@typescript-eslint/parser": "^8.43.0",
+    "eslint": "^9.35.0",
+    "eslint-config-expo": "^10.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "prettier": "^3.6.2",
+    "typescript": "~5.4.5"
+  },
+  "engines": {
+    "node": "20.x",
+    "pnpm": "9.x"
+  }
 }
