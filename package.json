@@ -87,5 +87,9 @@
                                    "metro-cache":  "0.82.5",
                                    "metro-transform-worker":  "0.82.5"
                                }
-             }
+             },
+    "engines":  {
+                    "node":  "20.x",
+                    "pnpm":  "9.x"
+                }
 }
