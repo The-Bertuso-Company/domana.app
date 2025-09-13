@@ -1,23 +1,22 @@
 // app.config.ts
 import { withSettingsGradle } from '@expo/config-plugins';
 
-// Rewrites pluginManagement{} and scrubs stray includeBuild lines outside it
-const withSanitizeSettingsGradle = (config) =>
+// Cleanly rebuild pluginManagement and scrub strays
+const withCleanSettingsGradle = (config) =>
   withSettingsGradle(config, (cfg) => {
     let s = cfg.modResults.contents;
 
-    // 1) Drop any existing pluginManagement block entirely
-    const pmRe = /pluginManagement\s*\{[\s\S]*?\}\s*/m;
-    s = s.replace(pmRe, '');
+    // 1) remove any existing pluginManagement block
+    s = s.replace(/pluginManagement\s*\{[\s\S]*?\}\s*/m, '');
 
-    // 2) Remove ANY stray includeBuild lines for RN plugin, Expo Modules, or react-settings-plugin outside the block
-    const strayIncludesRe =
-      /\s*includeBuild\([^\n]*(@react-native\/gradle-plugin|expo-modules-core\/android|react-settings-plugin)[^\n]*\)\s*\r?\n/g;
-    s = s.replace(strayIncludesRe, '');
+    // 2) remove stray includeBuild lines anywhere (we'll add the right ones)
+    const stray =
+      /\s*includeBuild\([^\n]*(?:@react-native\/gradle-plugin|expo-modules-core\/android|react-settings-plugin)[^\n]*\)\s*\r?\n/g;
+    s = s.replace(stray, '');
 
-    // 3) Build a clean pluginManagement block
+    // 3) build a clean pluginManagement block (Groovy vars to avoid parse issues)
     const rnInclude = `includeBuild(new File(["node","--print","require.resolve('@react-native/gradle-plugin/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, rootDir).text.trim()).getParentFile())`;
-    const expoInclude = `includeBuild(new File(["node","--print","require.resolve('expo-modules-core/package.json')"].execute(null, rootDir).text.trim(), "../android"))`;
+
     const newBlock = `pluginManagement {
   repositories {
     gradlePluginPortal()
@@ -25,13 +24,18 @@ const withSanitizeSettingsGradle = (config) =>
     mavenCentral()
   }
   ${rnInclude}
-  ${expoInclude}
-  includeBuild("react-settings-plugin")
+
+  // Resolve expo-modules-core/android via Node, using Groovy vars to keep parsing safe
+  def expoCorePkg = ["node","--print","require.resolve('expo-modules-core/package.json')"].execute(null, rootDir).text.trim()
+  def expoCoreDir = new File(expoCorePkg).getParentFile() // .../node_modules/expo-modules-core
+  def expoCoreAndroid = new File(expoCoreDir, "android")
+  includeBuild(expoCoreAndroid)
 }
 `;
 
-    // 4) Prepend the new block, followed by the rest of the file (now clean)
-    s = `${newBlock}\n${s}`.trim() + '\n';
+    // 4) prepend our new pluginManagement and the RN settings plugin include (top-level)
+    const topLevelReactSettings = `includeBuild("react-settings-plugin")\n`;
+    s = `${newBlock}\n${topLevelReactSettings}${s}`.trim() + '\n';
 
     cfg.modResults.contents = s;
     return cfg;
@@ -85,8 +89,8 @@ export default ({ config }) => {
           },
         },
       ],
-      // IMPORTANT: run our sanitizer LAST so it wins
-      withSanitizeSettingsGradle,
+      // run last so we win
+      withCleanSettingsGradle,
     ],
 
     ios: {
