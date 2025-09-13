@@ -1,4 +1,29 @@
 import { ConfigContext, ExpoConfig } from 'expo/config';
+import { withSettingsGradle } from '@expo/config-plugins';
+
+// Inject expo-modules-core's Gradle plugin repository into pluginManagement { repositories { ... } }
+const withExpoModulesGradleRepo = (config: any) =>
+  withSettingsGradle(config, (cfg) => {
+    let contents: string = cfg.modResults.contents;
+
+    // Already present? Do nothing.
+    if (/expo-modules-core\/android/.test(contents)) {
+      return cfg;
+    }
+
+    const inject = `
+  repositories {
+    // Make the Expo Modules Gradle plugin resolvable
+    maven { url(new File(["node", "--print", "require.resolve('expo-modules-core/package.json')"].execute(null, rootDir).text.trim()).getParentFile().toString() + "/android") }
+    gradlePluginPortal()
+    google()
+    mavenCentral()
+  }`;
+
+    contents = contents.replace(/pluginManagement\s*\{/, (m) => `${m}\n${inject}\n`);
+    cfg.modResults.contents = contents;
+    return cfg;
+  });
 
 function parseSemver(v: string) {
   const [major, minor, patch] = v.split('.').map((x) => Number(x || 0));
@@ -23,12 +48,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN ?? '';
   const ANDROID_MAPS_KEY = process.env.EXPO_PUBLIC_ANDROID_GOOGLE_MAPS_API_KEY ?? '';
 
-  // Versioning
+  // Versioning (kept for manifest/runtime reads; EAS uses remote app version source)
   const derivedVersionCode = toAndroidVersionCode(VERSION);
   const ANDROID_VERSION_CODE = Number(process.env.ANDROID_VERSION_CODE ?? derivedVersionCode);
   const IOS_BUILD_NUMBER = String(process.env.IOS_BUILD_NUMBER ?? derivedVersionCode);
 
-  return {
+  return withExpoModulesGradleRepo({
     ...config,
     name: 'Domana',
     slug: 'domana',
@@ -37,7 +62,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     icon: './assets/icon.png',
     scheme: SCHEME,
 
-    // 🔧 Ensure custom dev client native bits are added, and configure Gradle for pnpm monorepos
+    // Custom dev client + Gradle hints for pnpm workspaces
     plugins: [
       'expo-dev-client',
       [
@@ -45,7 +70,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         {
           android: {
             gradleProperties: {
-              // pnpm workspace: point Gradle at the *root* node_modules
+              // pnpm workspace: point Gradle at the root node_modules
               REACT_NATIVE_NODE_MODULES_DIR: '../../node_modules',
             },
           },
@@ -70,6 +95,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
     android: {
       package: APP_ID,
+      // NOTE: EAS remote versioning ignores this for Play, but we keep it for manifest/Constants reads.
       versionCode: ANDROID_VERSION_CODE,
       adaptiveIcon: {
         foregroundImage: './assets/adaptive-icon.png',
@@ -87,7 +113,5 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       apiBaseUrl: API_BASE_URL,
       sentryDsn: SENTRY_DSN,
     },
-
-    runtimeVersion: { policy: 'appVersion' },
-  };
+  } as ExpoConfig);
 };
