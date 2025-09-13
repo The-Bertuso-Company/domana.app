@@ -47,6 +47,9 @@ importers:
       '@react-native-community/eslint-config':
         specifier: ^3.2.0
         version: 3.2.0(eslint@9.35.0)(prettier@3.6.2)(typescript@5.4.5)
+      '@react-native/gradle-plugin':
+        specifier: ^0.74
+        version: 0.74.81
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.43.0
         version: 8.43.0(@typescript-eslint/parser@8.43.0(eslint@9.35.0)(typescript@5.4.5))(eslint@9.35.0)(typescript@5.4.5)
@@ -80,9 +83,6 @@ importers:
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
-      react-native-gradle-plugin:
-        specifier: 0.71.19
-        version: 0.71.19
       typescript:
         specifier: ~5.4.5
         version: 5.4.5
@@ -4406,9 +4406,6 @@ packages:
 
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
-
-  react-native-gradle-plugin@0.71.19:
-    resolution: {integrity: sha512-1dVk9NwhoyKHCSxcrM6vY6cxmojeATsBobDicX0ZKr7DgUF2cBQRTKsimQFvzH8XhOVXyH8p4HyDSZNIFI8OlQ==}
 
   react-native-web@0.19.13:
     resolution: {integrity: sha512-etv3bN8rJglrRCp/uL4p7l8QvUNUC++QwDbdZ8CB7BvZiMvsxfFIRM1j04vxNldG3uo2puRd6OSWR3ibtmc29A==}
@@ -11144,8 +11141,6 @@ snapshots:
   react-is@17.0.2: {}
 
   react-is@18.3.1: {}
-
-  react-native-gradle-plugin@0.71.19: {}
 
   react-native-web@0.19.13(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
