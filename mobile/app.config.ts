@@ -1,9 +1,45 @@
 import { ConfigContext, ExpoConfig } from 'expo/config';
+import { withSettingsGradle } from '@expo/config-plugins';
+
+// Inject includeBuild for expo-modules-core so Gradle can resolve `expo-module-gradle-plugin`
+const withExpoModulesPluginInclude = (config: any) =>
+  withSettingsGradle(config, (cfg) => {
+    let contents: string = cfg.modResults.contents;
+
+    // Ensure pluginManagement.repositories exists (some templates omit it)
+    if (!/pluginManagement[\s\S]*repositories\s*\{/.test(contents)) {
+      contents = contents.replace(
+        /pluginManagement\s*\{/,
+        (m) => `${m}
+  repositories {
+    gradlePluginPortal()
+    google()
+    mavenCentral()
+  }`,
+      );
+    }
+
+    const includeLine = `  includeBuild(new File(rootDir, "../node_modules/expo-modules-core/android"))`;
+
+    // Only add once
+    if (!contents.includes('expo-modules-core/android')) {
+      contents = contents.replace(
+        /pluginManagement\s*\{/,
+        (m) => `${m}
+${includeLine}
+`,
+      );
+    }
+
+    cfg.modResults.contents = contents;
+    return cfg;
+  });
 
 function parseSemver(v: string) {
   const [major, minor, patch] = v.split('.').map((x) => Number(x || 0));
   return { major: major || 0, minor: minor || 0, patch: patch || 0 };
 }
+/** versionCode = major*10000 + minor*100 + patch (e.g., 1.2.3 => 10203) */
 function toAndroidVersionCode(semver: string): number {
   const { major, minor, patch } = parseSemver(semver);
   const code = major * 10000 + minor * 100 + patch;
@@ -24,7 +60,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const ANDROID_VERSION_CODE = Number(process.env.ANDROID_VERSION_CODE ?? derivedVersionCode);
   const IOS_BUILD_NUMBER = String(process.env.IOS_BUILD_NUMBER ?? derivedVersionCode);
 
-  return {
+  return withExpoModulesPluginInclude({
     ...config,
     name: 'Domana',
     slug: 'domana',
@@ -33,7 +69,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     icon: './assets/icon.png',
     scheme: SCHEME,
 
-    // Keep dev client and pnpm-friendly Gradle property
     plugins: [
       'expo-dev-client',
       [
@@ -41,8 +76,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         {
           android: {
             gradleProperties: {
-              // pnpm workspace: point Gradle at the *project* node_modules on EAS
-              REACT_NATIVE_NODE_MODULES_DIR: '../../node_modules',
+              // pnpm monorepo: point Gradle at the project-level node_modules on EAS
+              REACT_NATIVE_NODE_MODULES_DIR: '../node_modules',
             },
           },
         },
@@ -77,7 +112,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
     updates: { url: 'https://u.expo.dev/69982f4e-c195-48d6-923a-986f1b67cd1d' },
 
-    // Required by expo-updates and fixes the earlier prebuild error
+    // Required by expo-updates / EAS Update
     runtimeVersion: { policy: 'appVersion' },
 
     extra: {
@@ -86,5 +121,5 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       apiBaseUrl: API_BASE_URL,
       sentryDsn: SENTRY_DSN,
     },
-  } as ExpoConfig;
+  } as ExpoConfig);
 };
