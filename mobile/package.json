@@ -17,7 +17,9 @@
     "build:stg": "eas build --profile staging --platform all",
     "build:prod": "eas build --profile production --platform all",
     "submit:and": "eas submit --platform android --profile production",
-    "submit:ios": "eas submit --platform ios --profile production"
+    "submit:ios": "eas submit --platform ios --profile production",
+    "cred:android": "eas credentials -p android",
+    "cred:ios": "eas credentials -p ios"
   },
   "dependencies": {
     "expo": "~51.0.0",
@@ -34,6 +36,7 @@
     "@react-native-community/eslint-config": "^3.2.0",
     "@typescript-eslint/eslint-plugin": "^8.43.0",
     "@typescript-eslint/parser": "^8.43.0",
+    "eas-cli": "^16.19.1",
     "eslint": "^9.35.0",
     "eslint-config-expo": "^10.0.0",
     "eslint-config-prettier": "^10.1.8",
