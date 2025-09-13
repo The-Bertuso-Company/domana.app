@@ -1,20 +1,20 @@
 // app.config.ts
 import { withSettingsGradle } from '@expo/config-plugins';
 
-// Cleanly rebuild pluginManagement and scrub strays
+// Rebuild pluginManagement cleanly and move react-settings-plugin to top-level
 const withCleanSettingsGradle = (config) =>
   withSettingsGradle(config, (cfg) => {
     let s = cfg.modResults.contents;
 
-    // 1) remove any existing pluginManagement block
+    // 1) Remove any existing pluginManagement block
     s = s.replace(/pluginManagement\s*\{[\s\S]*?\}\s*/m, '');
 
-    // 2) remove stray includeBuild lines anywhere (we'll add the right ones)
+    // 2) Remove stray includeBuild lines anywhere (we’ll add correct ones)
     const stray =
       /\s*includeBuild\([^\n]*(?:@react-native\/gradle-plugin|expo-modules-core\/android|react-settings-plugin)[^\n]*\)\s*\r?\n/g;
     s = s.replace(stray, '');
 
-    // 3) build a clean pluginManagement block (Groovy vars to avoid parse issues)
+    // 3) Our clean pluginManagement block (Groovy-safe, with explicit expoCoreAndroid)
     const rnInclude = `includeBuild(new File(["node","--print","require.resolve('@react-native/gradle-plugin/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, rootDir).text.trim()).getParentFile())`;
 
     const newBlock = `pluginManagement {
@@ -25,7 +25,7 @@ const withCleanSettingsGradle = (config) =>
   }
   ${rnInclude}
 
-  // Resolve expo-modules-core/android via Node, using Groovy vars to keep parsing safe
+  // Resolve expo-modules-core/android via Node (Groovy-safe)
   def expoCorePkg = ["node","--print","require.resolve('expo-modules-core/package.json')"].execute(null, rootDir).text.trim()
   def expoCoreDir = new File(expoCorePkg).getParentFile() // .../node_modules/expo-modules-core
   def expoCoreAndroid = new File(expoCoreDir, "android")
@@ -33,8 +33,10 @@ const withCleanSettingsGradle = (config) =>
 }
 `;
 
-    // 4) prepend our new pluginManagement and the RN settings plugin include (top-level)
+    // 4) Put RN settings plugin include at top-level (outside pluginManagement)
     const topLevelReactSettings = `includeBuild("react-settings-plugin")\n`;
+
+    // Prepend our block + top-level include
     s = `${newBlock}\n${topLevelReactSettings}${s}`.trim() + '\n';
 
     cfg.modResults.contents = s;
@@ -46,7 +48,6 @@ function parseSemver(v) {
   const [major, minor, patch] = (v || '').split('.').map((x) => Number(x || 0));
   return { major: major || 0, minor: minor || 0, patch: patch || 0 };
 }
-/** versionCode = major*10000 + minor*100 + patch */
 function toAndroidVersionCode(semver) {
   const { major, minor, patch } = parseSemver(semver);
   const code = major * 10000 + minor * 100 + patch;
@@ -89,8 +90,7 @@ export default ({ config }) => {
           },
         },
       ],
-      // run last so we win
-      withCleanSettingsGradle,
+      withCleanSettingsGradle, // run last so we win
     ],
 
     ios: {
