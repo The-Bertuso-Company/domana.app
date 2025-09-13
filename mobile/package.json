@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "domana-mobile",
   "version": "0.0.1",
   "private": true,
@@ -25,7 +25,9 @@
   "dependencies": {
     "expo": "~51.0.0",
     "expo-constants": "^18.0.8",
+    "expo-dev-client": "~4.0.29",
     "expo-status-bar": "~1.12.1",
+    "expo-updates": "~0.25.28",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.74.0",
