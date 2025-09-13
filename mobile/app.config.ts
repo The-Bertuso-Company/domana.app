@@ -1,12 +1,10 @@
 import { ConfigContext, ExpoConfig } from 'expo/config';
 import { withSettingsGradle } from '@expo/config-plugins';
 
-// Ensure settings.gradle can resolve the Expo Modules Gradle plugin from expo-modules-core/android
 const withExpoModulesIncludeBuild = (config: any) =>
   withSettingsGradle(config, (cfg) => {
     let contents: string = cfg.modResults.contents;
 
-    // Already present? bail.
     if (
       contents.includes('expo-modules-core/package.json') ||
       contents.includes('expo-modules-core/android')
@@ -14,8 +12,7 @@ const withExpoModulesIncludeBuild = (config: any) =>
       return cfg;
     }
 
-    // 1) Add includeBuild for expo-modules-core/android (place it next to the RN gradle plugin includeBuild if present)
-    const includeLine = `  includeBuild(new File([\"node\", \"--print\", \"require.resolve('expo-modules-core/package.json')\"].execute(null, rootDir).text.trim(), \"../android\"))`;
+    const includeLine = `  includeBuild(new File(["node", "--print", "require.resolve('expo-modules-core/package.json')"].execute(null, rootDir).text.trim(), "../android"))`;
 
     if (/includeBuild\(.+@react-native\/gradle-plugin.+\)/.test(contents)) {
       contents = contents.replace(
@@ -23,11 +20,9 @@ const withExpoModulesIncludeBuild = (config: any) =>
         `$1${includeLine}\n`,
       );
     } else {
-      // fallback: inject right after "pluginManagement {"
       contents = contents.replace(/pluginManagement\s*\{/, (m) => `${m}\n${includeLine}\n`);
     }
 
-    // 2) Ensure pluginManagement.repositories exists (Gradle needs these even with includeBuild)
     if (!/pluginManagement[\s\S]*repositories\s*\{/.test(contents)) {
       const reposBlock = `
   repositories {
@@ -46,8 +41,6 @@ function parseSemver(v: string) {
   const [major, minor, patch] = v.split('.').map((x) => Number(x || 0));
   return { major: major || 0, minor: minor || 0, patch: patch || 0 };
 }
-
-/** versionCode = major*10000 + minor*100 + patch (e.g., 1.2.3 => 10203) */
 function toAndroidVersionCode(semver: string): number {
   const { major, minor, patch } = parseSemver(semver);
   const code = major * 10000 + minor * 100 + patch;
@@ -59,13 +52,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const APP_ID = 'com.domana.app';
   const SCHEME = 'domana';
 
-  // Build-time / public envs
   const EAS_CHANNEL = process.env.EAS_CHANNEL ?? 'dev';
   const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://localhost:4000';
   const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN ?? '';
   const ANDROID_MAPS_KEY = process.env.EXPO_PUBLIC_ANDROID_GOOGLE_MAPS_API_KEY ?? '';
 
-  // Versioning (kept for manifest/Constants reads)
   const derivedVersionCode = toAndroidVersionCode(VERSION);
   const ANDROID_VERSION_CODE = Number(process.env.ANDROID_VERSION_CODE ?? derivedVersionCode);
   const IOS_BUILD_NUMBER = String(process.env.IOS_BUILD_NUMBER ?? derivedVersionCode);
@@ -79,7 +70,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     icon: './assets/icon.png',
     scheme: SCHEME,
 
-    // Dev client + pnpm Gradle hint
     plugins: [
       'expo-dev-client',
       [
@@ -121,6 +111,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
 
     updates: { url: 'https://u.expo.dev/69982f4e-c195-48d6-923a-986f1b67cd1d' },
+
+    // ✅ This line fixes the prebuild error
+    runtimeVersion: { policy: 'appVersion' },
 
     extra: {
       eas: { projectId: '69982f4e-c195-48d6-923a-986f1b67cd1d' },
