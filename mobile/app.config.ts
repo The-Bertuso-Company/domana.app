@@ -1,17 +1,23 @@
-// app.config.ts (no TS annotations)
+// app.config.ts
 import { withSettingsGradle } from '@expo/config-plugins';
 
-const withFixSettingsGradle = (config) =>
+// Rewrites pluginManagement{} and scrubs stray includeBuild lines outside it
+const withSanitizeSettingsGradle = (config) =>
   withSettingsGradle(config, (cfg) => {
     let s = cfg.modResults.contents;
 
-    // Remove ANY stray expo-modules-core includeBuild lines anywhere
-    s = s.replace(/\s*includeBuild\([^\n]*expo-modules-core\/android[^\n]*\)\s*\r?\n/g, '');
+    // 1) Drop any existing pluginManagement block entirely
+    const pmRe = /pluginManagement\s*\{[\s\S]*?\}\s*/m;
+    s = s.replace(pmRe, '');
 
-    // Build a clean pluginManagement block with Node-resolved includes
+    // 2) Remove ANY stray includeBuild lines for RN plugin, Expo Modules, or react-settings-plugin outside the block
+    const strayIncludesRe =
+      /\s*includeBuild\([^\n]*(@react-native\/gradle-plugin|expo-modules-core\/android|react-settings-plugin)[^\n]*\)\s*\r?\n/g;
+    s = s.replace(strayIncludesRe, '');
+
+    // 3) Build a clean pluginManagement block
     const rnInclude = `includeBuild(new File(["node","--print","require.resolve('@react-native/gradle-plugin/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, rootDir).text.trim()).getParentFile())`;
     const expoInclude = `includeBuild(new File(["node","--print","require.resolve('expo-modules-core/package.json')"].execute(null, rootDir).text.trim(), "../android"))`;
-
     const newBlock = `pluginManagement {
   repositories {
     gradlePluginPortal()
@@ -20,21 +26,12 @@ const withFixSettingsGradle = (config) =>
   }
   ${rnInclude}
   ${expoInclude}
-  // Keep RN settings plugin (present in template)
   includeBuild("react-settings-plugin")
 }
 `;
 
-    // Replace the entire pluginManagement block (or prepend if missing)
-    const pmRe = /pluginManagement\s*\{[\s\S]*?\}\s*/m;
-    if (pmRe.test(s)) {
-      s = s.replace(pmRe, newBlock);
-    } else {
-      s = newBlock + '\n' + s;
-    }
-
-    // Safety: scrub again outside our block
-    s = s.replace(/\s*includeBuild\([^\n]*expo-modules-core\/android[^\n]*\)\s*\r?\n/g, '');
+    // 4) Prepend the new block, followed by the rest of the file (now clean)
+    s = `${newBlock}\n${s}`.trim() + '\n';
 
     cfg.modResults.contents = s;
     return cfg;
@@ -82,14 +79,14 @@ export default ({ config }) => {
         {
           android: {
             gradleProperties: {
-              // pnpm monorepo: on EAS, node_modules is at repo root
+              // pnpm monorepo: node_modules is at repo root on EAS
               REACT_NATIVE_NODE_MODULES_DIR: '../../node_modules',
             },
           },
         },
       ],
-      // IMPORTANT: run our fixer LAST so it wins
-      withFixSettingsGradle,
+      // IMPORTANT: run our sanitizer LAST so it wins
+      withSanitizeSettingsGradle,
     ],
 
     ios: {
