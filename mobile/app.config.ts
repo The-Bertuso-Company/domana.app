@@ -37,8 +37,21 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     icon: './assets/icon.png',
     scheme: SCHEME,
 
-    // 🔧 Ensure custom dev client native bits are added
-    plugins: ['expo-dev-client'],
+    // 🔧 Ensure custom dev client native bits are added, and configure Gradle for pnpm monorepos
+    plugins: [
+      'expo-dev-client',
+      [
+        'expo-build-properties',
+        {
+          android: {
+            gradleProperties: {
+              // pnpm workspace: point Gradle at the *root* node_modules
+              REACT_NATIVE_NODE_MODULES_DIR: '../../node_modules',
+            },
+          },
+        },
+      ],
+    ],
 
     ios: {
       supportsTablet: true,
