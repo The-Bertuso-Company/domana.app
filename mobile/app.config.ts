@@ -1,45 +1,61 @@
-import { ConfigContext, ExpoConfig } from 'expo/config';
-import { withSettingsGradle } from '@expo/config-plugins';
+import { ConfigContext, ExpoConfig } from "expo/config";
+import { withSettingsGradle, ConfigPlugin } from "@expo/config-plugins";
 
-// Inject includeBuild for expo-modules-core so Gradle can resolve `expo-module-gradle-plugin`
-const withExpoModulesPluginInclude = (config: any) =>
+const withFixSettingsGradle: ConfigPlugin = (config) =>
   withSettingsGradle(config, (cfg) => {
-    let contents: string = cfg.modResults.contents;
+    let s = cfg.modResults.contents;
 
-    // Ensure pluginManagement.repositories exists (some templates omit it)
-    if (!/pluginManagement[\s\S]*repositories\s*\{/.test(contents)) {
-      contents = contents.replace(
-        /pluginManagement\s*\{/,
-        (m) => `${m}
+    // 0) Nuke ANY stray expo-modules-core includeBuild lines anywhere
+    s = s.replace(/\s*includeBuild\([^\n]*expo-modules-core\/android[^\n]*\)\s*\r?\n/g, "");
+
+    // 1) Build a clean pluginManagement block
+    const rnIncludeInside =
+      `includeBuild(new File(["node","--print","require.resolve('@react-native/gradle-plugin/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, rootDir).text.trim()).getParentFile())`;
+    const expoIncludeInside =
+      `includeBuild(new File(["node","--print","require.resolve('expo-modules-core/package.json')"].execute(null, rootDir).text.trim(), "../android"))`;
+
+    const newBlock = `pluginManagement {
   repositories {
     gradlePluginPortal()
     google()
     mavenCentral()
-  }`,
-      );
+  }
+  ${rnIncludeInside}
+  ${expoIncludeInside}
+
+  // RN 0.74 settings plugin only for <= 0.74.3
+  def version = providers.exec { commandLine("node", "-e", "console.log(require('react-native/package.json').version);") }.standardOutput.asText.get().trim()
+  def vcore = version.split("-")[0]
+  def (_, rnMinor, rnPatch) = vcore.tokenize(".").collect { it.toInteger() }
+  if (rnMinor == 74 && rnPatch <= 3) {
+    includeBuild("react-settings-plugin")
+  }
+}
+`;
+
+    // 2) Replace the whole pluginManagement block (or prepend if missing)
+    const start = s.indexOf("pluginManagement {");
+    const endAnchor = s.indexOf("plugins {", start >= 0 ? start : 0); // RN template places this right after
+    if (start >= 0 && endAnchor >= 0) {
+      s = s.slice(0, start) + newBlock + s.slice(endAnchor);
+    } else if (start >= 0) {
+      s = s.slice(0, start) + newBlock;
+    } else {
+      s = newBlock + "\n" + s;
     }
 
-    const includeLine = `  includeBuild(new File(rootDir, "../node_modules/expo-modules-core/android"))`;
+    // 3) (Safety) Remove any remaining expo-modules-core includeBuild again (outside our block)
+    s = s.replace(/\s*includeBuild\([^\n]*expo-modules-core\/android[^\n]*\)\s*\r?\n/g, "");
 
-    // Only add once
-    if (!contents.includes('expo-modules-core/android')) {
-      contents = contents.replace(
-        /pluginManagement\s*\{/,
-        (m) => `${m}
-${includeLine}
-`,
-      );
-    }
-
-    cfg.modResults.contents = contents;
+    cfg.modResults.contents = s;
     return cfg;
   });
 
 function parseSemver(v: string) {
-  const [major, minor, patch] = v.split('.').map((x) => Number(x || 0));
+  const [major, minor, patch] = v.split(".").map((x) => Number(x || 0));
   return { major: major || 0, minor: minor || 0, patch: patch || 0 };
 }
-/** versionCode = major*10000 + minor*100 + patch (e.g., 1.2.3 => 10203) */
+/** versionCode = major*10000 + minor*100 + patch */
 function toAndroidVersionCode(semver: string): number {
   const { major, minor, patch } = parseSemver(semver);
   const code = major * 10000 + minor * 100 + patch;
@@ -47,41 +63,43 @@ function toAndroidVersionCode(semver: string): number {
 }
 
 export default ({ config }: ConfigContext): ExpoConfig => {
-  const VERSION = '0.0.1';
-  const APP_ID = 'com.domana.app';
-  const SCHEME = 'domana';
+  const VERSION = "0.0.1";
+  const APP_ID = "com.domana.app";
+  const SCHEME = "domana";
 
-  const EAS_CHANNEL = process.env.EAS_CHANNEL ?? 'dev';
-  const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://localhost:4000';
-  const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN ?? '';
-  const ANDROID_MAPS_KEY = process.env.EXPO_PUBLIC_ANDROID_GOOGLE_MAPS_API_KEY ?? '';
+  const EAS_CHANNEL = process.env.EAS_CHANNEL ?? "dev";
+  const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? "http://localhost:4000";
+  const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN ?? "";
+  const ANDROID_MAPS_KEY = process.env.EXPO_PUBLIC_ANDROID_GOOGLE_MAPS_API_KEY ?? "";
 
   const derivedVersionCode = toAndroidVersionCode(VERSION);
   const ANDROID_VERSION_CODE = Number(process.env.ANDROID_VERSION_CODE ?? derivedVersionCode);
   const IOS_BUILD_NUMBER = String(process.env.IOS_BUILD_NUMBER ?? derivedVersionCode);
 
-  return withExpoModulesPluginInclude({
+  return {
     ...config,
-    name: 'Domana',
-    slug: 'domana',
+    name: "Domana",
+    slug: "domana",
     version: VERSION,
-    orientation: 'portrait',
-    icon: './assets/icon.png',
+    orientation: "portrait",
+    icon: "./assets/icon.png",
     scheme: SCHEME,
 
     plugins: [
-      'expo-dev-client',
+      "expo-dev-client",
       [
-        'expo-build-properties',
+        "expo-build-properties",
         {
           android: {
             gradleProperties: {
-              // pnpm monorepo: point Gradle at the project-level node_modules on EAS
-              REACT_NATIVE_NODE_MODULES_DIR: '../node_modules',
+              // pnpm monorepo: on EAS, node_modules is at repo root
+              REACT_NATIVE_NODE_MODULES_DIR: "../../node_modules",
             },
           },
         },
       ],
+      // 👇 run our fixer LAST so it wins over any other settings.gradle edits
+      withFixSettingsGradle,
     ],
 
     ios: {
@@ -90,12 +108,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       buildNumber: IOS_BUILD_NUMBER,
       infoPlist: {
         NSLocationWhenInUseUsageDescription:
-          'Domana uses your location to show nearby content and improve map experiences.',
-        NSCameraUsageDescription: 'Domana needs camera access to let you scan or upload photos.',
-        NSPhotoLibraryAddUsageDescription:
-          'Domana saves images to your library when you export or download content.',
-        NSPhotoLibraryUsageDescription:
-          'Domana needs access to your photo library to let you pick images.',
+          "Domana uses your location to show nearby content and improve map experiences.",
+        NSCameraUsageDescription: "Domana needs camera access to let you scan or upload photos.",
       },
     },
 
@@ -103,20 +117,18 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       package: APP_ID,
       versionCode: ANDROID_VERSION_CODE,
       adaptiveIcon: {
-        foregroundImage: './assets/adaptive-icon.png',
-        backgroundColor: '#ffffff',
+        foregroundImage: "./assets/adaptive-icon.png",
+        backgroundColor: "#ffffff",
       },
-      permissions: ['ACCESS_COARSE_LOCATION', 'ACCESS_FINE_LOCATION'],
+      permissions: ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
       ...(ANDROID_MAPS_KEY ? { config: { googleMaps: { apiKey: ANDROID_MAPS_KEY } } } : {}),
     },
 
-    updates: { url: 'https://u.expo.dev/69982f4e-c195-48d6-923a-986f1b67cd1d' },
-
-    // Required by expo-updates / EAS Update
-    runtimeVersion: { policy: 'appVersion' },
+    updates: { url: "https://u.expo.dev/69982f4e-c195-48d6-923a-986f1b67cd1d" },
+    runtimeVersion: { policy: "appVersion" },
 
     extra: {
-      eas: { projectId: '69982f4e-c195-48d6-923a-986f1b67cd1d' },
+      eas: { projectId: "69982f4e-c195-48d6-923a-986f1b67cd1d" },
       easChannel: EAS_CHANNEL,
       apiBaseUrl: API_BASE_URL,
       sentryDsn: SENTRY_DSN,
