@@ -19,7 +19,8 @@
     "submit:and": "eas submit --platform android --profile production",
     "submit:ios": "eas submit --platform ios --profile production",
     "cred:android": "eas credentials -p android",
-    "cred:ios": "eas credentials -p ios"
+    "cred:ios": "eas credentials -p ios",
+    "build:adev": "eas build --profile development --platform android"
   },
   "dependencies": {
     "expo": "~51.0.0",
