@@ -1,0 +1,30 @@
+{
+  "cli": { "version": ">= 8.0.0" },
+  "build": {
+    "development": {
+      "channel": "dev",
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": { "EAS_CHANNEL": "dev" },
+      "android": { "buildType": "apk" },
+      "ios": { "simulator": false }
+    },
+    "staging": {
+      "channel": "staging",
+      "distribution": "internal",
+      "env": { "EAS_CHANNEL": "staging" }
+    },
+    "production": {
+      "channel": "prod",
+      "env": { "EAS_CHANNEL": "prod" }
+    }
+  },
+  "submit": {
+    "staging": {
+      "android": { "track": "internal" }
+    },
+    "production": {
+      "android": { "track": "production" }
+    }
+  }
+}
