@@ -9,7 +9,7 @@ function parseSemver(v: string) {
 function toAndroidVersionCode(semver: string): number {
   const { major, minor, patch } = parseSemver(semver);
   const code = major * 10000 + minor * 100 + patch;
-  return Math.max(1, code); // must be >= 1
+  return Math.max(1, code);
 }
 
 export default ({ config }: ConfigContext): ExpoConfig => {
@@ -23,7 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN ?? '';
   const ANDROID_MAPS_KEY = process.env.EXPO_PUBLIC_ANDROID_GOOGLE_MAPS_API_KEY ?? '';
 
-  // Versioning (env overrides take precedence)
+  // Versioning
   const derivedVersionCode = toAndroidVersionCode(VERSION);
   const ANDROID_VERSION_CODE = Number(process.env.ANDROID_VERSION_CODE ?? derivedVersionCode);
   const IOS_BUILD_NUMBER = String(process.env.IOS_BUILD_NUMBER ?? derivedVersionCode);
@@ -36,6 +36,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     orientation: 'portrait',
     icon: './assets/icon.png',
     scheme: SCHEME,
+
+    // 🔧 Ensure custom dev client native bits are added
+    plugins: ['expo-dev-client'],
 
     ios: {
       supportsTablet: true,
@@ -60,13 +63,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         backgroundColor: '#ffffff',
       },
       permissions: ['ACCESS_COARSE_LOCATION', 'ACCESS_FINE_LOCATION'],
-      // Only include Maps meta-data when a non-empty key is provided
       ...(ANDROID_MAPS_KEY ? { config: { googleMaps: { apiKey: ANDROID_MAPS_KEY } } } : {}),
     },
 
-    updates: {
-      url: 'https://u.expo.dev/69982f4e-c195-48d6-923a-986f1b67cd1d',
-    },
+    updates: { url: 'https://u.expo.dev/69982f4e-c195-48d6-923a-986f1b67cd1d' },
 
     extra: {
       eas: { projectId: '69982f4e-c195-48d6-923a-986f1b67cd1d' },
