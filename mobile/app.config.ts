@@ -41,7 +41,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       supportsTablet: true,
       bundleIdentifier: APP_ID,
       buildNumber: IOS_BUILD_NUMBER,
-      // Permission copy (can tweak anytime)
       infoPlist: {
         NSLocationWhenInUseUsageDescription:
           'Domana uses your location to show nearby content and improve map experiences.',
@@ -60,17 +59,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         foregroundImage: './assets/adaptive-icon.png',
         backgroundColor: '#ffffff',
       },
-      // Declare location permissions explicitly
       permissions: ['ACCESS_COARSE_LOCATION', 'ACCESS_FINE_LOCATION'],
-      // Inject Google Maps meta-data
-      config: {
-        googleMaps: {
-          apiKey: ANDROID_MAPS_KEY,
-        },
-      },
+      // Only include Maps meta-data when a non-empty key is provided
+      ...(ANDROID_MAPS_KEY ? { config: { googleMaps: { apiKey: ANDROID_MAPS_KEY } } } : {}),
     },
 
-    // OTA updates host for this EAS project
     updates: {
       url: 'https://u.expo.dev/69982f4e-c195-48d6-923a-986f1b67cd1d',
     },
@@ -82,7 +75,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       sentryDsn: SENTRY_DSN,
     },
 
-    // Keep updates stable across EAS channels using app version for runtime separation
     runtimeVersion: { policy: 'appVersion' },
   };
 };
