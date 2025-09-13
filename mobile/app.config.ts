@@ -21,6 +21,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const EAS_CHANNEL = process.env.EAS_CHANNEL ?? 'dev';
   const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://localhost:4000';
   const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN ?? '';
+  const ANDROID_MAPS_KEY = process.env.EXPO_PUBLIC_ANDROID_GOOGLE_MAPS_API_KEY ?? '';
 
   // Versioning (env overrides take precedence)
   const derivedVersionCode = toAndroidVersionCode(VERSION);
@@ -40,6 +41,16 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       supportsTablet: true,
       bundleIdentifier: APP_ID,
       buildNumber: IOS_BUILD_NUMBER,
+      // Permission copy (can tweak anytime)
+      infoPlist: {
+        NSLocationWhenInUseUsageDescription:
+          'Domana uses your location to show nearby content and improve map experiences.',
+        NSCameraUsageDescription: 'Domana needs camera access to let you scan or upload photos.',
+        NSPhotoLibraryAddUsageDescription:
+          'Domana saves images to your library when you export or download content.',
+        NSPhotoLibraryUsageDescription:
+          'Domana needs access to your photo library to let you pick images.',
+      },
     },
 
     android: {
@@ -48,6 +59,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       adaptiveIcon: {
         foregroundImage: './assets/adaptive-icon.png',
         backgroundColor: '#ffffff',
+      },
+      // Declare location permissions explicitly
+      permissions: ['ACCESS_COARSE_LOCATION', 'ACCESS_FINE_LOCATION'],
+      // Inject Google Maps meta-data
+      config: {
+        googleMaps: {
+          apiKey: ANDROID_MAPS_KEY,
+        },
       },
     },
 
