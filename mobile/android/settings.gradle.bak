@@ -1,0 +1,32 @@
+pluginManagement {
+  // Expose the RN Gradle plugin (for :app) from node_modules
+  includeBuild(file("$rootDir/../node_modules/@react-native/gradle-plugin"))
+  repositories {
+    maven { url("D:/dev/domana/node_modules/.pnpm/expo-modules-core@1.12.26/node_modules/expo-modules-core/android/maven") }
+    google()
+    mavenCentral()
+    gradlePluginPortal()
+  }
+  // Supply tool plugin versions here (so app/build.gradle can omit versions)
+  plugins {
+    id("com.android.application") version "8.6.1"
+    id("org.jetbrains.kotlin.android") version "1.9.24"
+  }
+}
+
+dependencyResolutionManagement {
+  repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+  repositories {
+    maven { url("D:/dev/domana/node_modules/.pnpm/expo-modules-core@1.12.26/node_modules/expo-modules-core/android/maven") }
+    google()
+    mavenCentral()
+  }
+}
+
+rootProject.name = "Domana"
+include(":app")
+
+// Legacy RN autolinking (works fine with PNPM absolute path)
+def nativeModulesGradle = file("D:/dev/domana/node_modules/.pnpm/@react-native-community+cli-platform-android@13.6.4/node_modules/@react-native-community/cli-platform-android/native_modules.gradle")
+apply from: nativeModulesGradle
+applyNativeModulesSettingsGradle(settings)

@@ -1,0 +1,22 @@
+buildscript {
+  repositories {
+    google()
+    mavenCentral()
+  }
+  
+ext {
+  compileSdkVersion = 34
+  targetSdkVersion  = 34
+  minSdkVersion     = 23
+  kotlinVersion     = "1.9.24"
+  ndkVersion        = "26.1.10909125"
+}
+dependencies {
+    // intentionally empty: plugin versions are supplied from settings.gradle (pluginManagement)
+  }
+}
+
+// Repos are defined in settings.gradle; no allprojects{} here.
+tasks.register("clean", Delete) {
+  delete rootProject.buildDir
+}

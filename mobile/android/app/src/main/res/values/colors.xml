@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- App theme colors -->
+  <color name="colorPrimary">#6200EE</color>
+  <color name="colorPrimaryDark">#3700B3</color>
+  <color name="colorAccent">#03DAC5</color>
+
+  <!-- Splash -->
+  <color name="splashscreen_background">#FFFFFF</color>
+
+  <!-- Adaptive icon background (match your ic_launcher*.xml) -->
+  <color name="iconBackground">#FFFFFF</color>
+  <!-- also provide the common RN name just in case -->
+  <color name="ic_launcher_background">#FFFFFF</color>
+</resources>
