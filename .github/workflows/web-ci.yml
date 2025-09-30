@@ -16,9 +16,9 @@ jobs:
         id: detect
         run: |
           if [ -f frontend/package.json ]; then
-            echo "present=true" >> 
+            echo "present=true" >> $GITHUB_OUTPUT
           else
-            echo "present=false" >> 
+            echo "present=false" >> $GITHUB_OUTPUT
           fi
       - name: Fast-pass (no frontend)
         if: steps.detect.outputs.present == 'false'
@@ -35,7 +35,7 @@ jobs:
         run: |
           cd frontend
           if [ -f pnpm-lock.yaml ]; then PN=pnpm; else PN=npm; fi
-          if [ "" = "pnpm" ]; then pnpm install --frozen-lockfile || pnpm install; else npm ci || npm i; fi
+          if [ "$PN" = "pnpm" ]; then pnpm install --frozen-lockfile || pnpm install; else npm ci || npm i; fi
       - name: Run typecheck (if script exists)
         if: steps.detect.outputs.present == 'true'
         run: |
@@ -52,9 +52,9 @@ jobs:
         id: detect
         run: |
           if [ -f frontend/package.json ]; then
-            echo "present=true" >> 
+            echo "present=true" >> $GITHUB_OUTPUT
           else
-            echo "present=false" >> 
+            echo "present=false" >> $GITHUB_OUTPUT
           fi
       - name: Fast-pass (no frontend)
         if: steps.detect.outputs.present == 'false'
@@ -71,7 +71,7 @@ jobs:
         run: |
           cd frontend
           if [ -f pnpm-lock.yaml ]; then PN=pnpm; else PN=npm; fi
-          if [ "" = "pnpm" ]; then pnpm install --frozen-lockfile || pnpm install; else npm ci || npm i; fi
+          if [ "$PN" = "pnpm" ]; then pnpm install --frozen-lockfile || pnpm install; else npm ci || npm i; fi
       - name: Run lint (if script exists)
         if: steps.detect.outputs.present == 'true'
         run: |
@@ -88,9 +88,9 @@ jobs:
         id: detect
         run: |
           if [ -f frontend/package.json ]; then
-            echo "present=true" >> 
+            echo "present=true" >> $GITHUB_OUTPUT
           else
-            echo "present=false" >> 
+            echo "present=false" >> $GITHUB_OUTPUT
           fi
       - name: Fast-pass (no frontend)
         if: steps.detect.outputs.present == 'false'
@@ -110,8 +110,8 @@ jobs:
           cd frontend
           if [ -f pnpm-lock.yaml ]; then PN=pnpm; else PN=npm; fi
           if node -e "p=require('./package.json');process.exit(p.scripts&&p.scripts.build?0:1)"; then
-            if [ "" = "pnpm" ]; then pnpm install --frozen-lockfile || pnpm install; else npm ci || npm i; fi
-             run build
+            if [ "$PN" = "pnpm" ]; then pnpm install --frozen-lockfile || pnpm install; else npm ci || npm i; fi
+            $PN run build
           else
             echo 'no build script; skipping'
           fi
