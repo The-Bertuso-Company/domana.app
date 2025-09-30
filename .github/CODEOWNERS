@@ -1,0 +1,8 @@
+﻿# CODEOWNERS - enforced by branch protection (code-owner reviews)
+*  @ @dinjbertuso
+TheBertusoCompany
+
+# Example future teams (uncomment when ready)
+# /backend/   @The-Bertuso-Company/backend
+# /frontend/  @The-Bertuso-Company/web
+# /mobile/    @The-Bertuso-Company/mobile
