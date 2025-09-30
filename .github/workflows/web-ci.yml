@@ -1,0 +1,87 @@
+﻿name: web-ci
+
+on:
+  pull_request:
+    branches: [ main, staging ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/web-ci.yml'
+  push:
+    branches: [ staging ]
+    paths:
+      - 'frontend/**'
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Enable corepack
+        run: corepack enable
+      - name: Install deps (frontend or skip)
+        run: |
+          if [ -f frontend/package.json ]; then
+            cd frontend
+            if [ -f pnpm-lock.yaml ]; then PN=pnpm; else PN=npm; fi
+            if [ "" = "pnpm" ]; then pnpm install --frozen-lockfile || pnpm install; else npm ci || npm i; fi
+            if node -e "p=require('./package.json');process.exit(p.scripts&&p.scripts.typecheck?0:1)"; then
+               run typecheck
+            else
+              echo 'no typecheck script; skipping';
+            fi
+          else
+            echo 'no frontend/package.json; skipping'
+          fi
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Enable corepack
+        run: corepack enable
+      - name: Install deps (frontend or skip)
+        run: |
+          if [ -f frontend/package.json ]; then
+            cd frontend
+            if [ -f pnpm-lock.yaml ]; then PN=pnpm; else PN=npm; fi
+            if [ "" = "pnpm" ]; then pnpm install --frozen-lockfile || pnpm install; else npm ci || npm i; fi
+            if node -e "p=require('./package.json');process.exit(p.scripts&&p.scripts.lint?0:1)"; then
+               run lint
+            else
+              echo 'no lint script; skipping';
+            fi
+          else
+            echo 'no frontend/package.json; skipping'
+          fi
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Enable corepack
+        run: corepack enable
+      - name: Build (frontend or skip)
+        env:
+          NEXT_PUBLIC_ENV: preview
+        run: |
+          if [ -f frontend/package.json ]; then
+            cd frontend
+            if [ -f pnpm-lock.yaml ]; then PN=pnpm; else PN=npm; fi
+            if [ "" = "pnpm" ]; then pnpm install --frozen-lockfile || pnpm install; else npm ci || npm i; fi
+            if node -e "p=require('./package.json');process.exit(p.scripts&&p.scripts.build?0:1)"; then
+               run build
+            else
+              echo 'no build script; skipping';
+            fi
+          else
+            echo 'no frontend/package.json; skipping'
+          fi
