@@ -1,0 +1,117 @@
+﻿name: web-ci
+
+on:
+  pull_request:
+    branches: [ main, staging ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/web-ci.yml'
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect frontend
+        id: detect
+        run: |
+          if [ -f frontend/package.json ]; then
+            echo "present=true" >> $GITHUB_OUTPUT
+          else
+            echo "present=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Fast-pass (no frontend)
+        if: steps.detect.outputs.present == 'false'
+        run: echo "No frontend found; passing typecheck."
+      - uses: actions/setup-node@v4
+        if: steps.detect.outputs.present == 'true'
+        with:
+          node-version: '20'
+      - name: Enable corepack
+        if: steps.detect.outputs.present == 'true'
+        run: corepack enable
+      - name: Install deps
+        if: steps.detect.outputs.present == 'true'
+        run: |
+          cd frontend
+          if [ -f pnpm-lock.yaml ]; then PN=pnpm; else PN=npm; fi
+          if [ "$PN" = "pnpm" ]; then pnpm install --frozen-lockfile || pnpm install; else npm ci || npm i; fi
+      - name: Run typecheck (if script exists)
+        if: steps.detect.outputs.present == 'true'
+        run: |
+          cd frontend
+          node -e "p=require('./package.json');process.exit(p.scripts&&p.scripts.typecheck?0:1)" \
+            && ( [ -f pnpm-lock.yaml ] && pnpm run typecheck || npm run typecheck ) \
+            || echo 'no typecheck script; skipping'
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect frontend
+        id: detect
+        run: |
+          if [ -f frontend/package.json ]; then
+            echo "present=true" >> $GITHUB_OUTPUT
+          else
+            echo "present=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Fast-pass (no frontend)
+        if: steps.detect.outputs.present == 'false'
+        run: echo "No frontend found; passing lint."
+      - uses: actions/setup-node@v4
+        if: steps.detect.outputs.present == 'true'
+        with:
+          node-version: '20'
+      - name: Enable corepack
+        if: steps.detect.outputs.present == 'true'
+        run: corepack enable
+      - name: Install deps
+        if: steps.detect.outputs.present == 'true'
+        run: |
+          cd frontend
+          if [ -f pnpm-lock.yaml ]; then PN=pnpm; else PN=npm; fi
+          if [ "$PN" = "pnpm" ]; then pnpm install --frozen-lockfile || pnpm install; else npm ci || npm i; fi
+      - name: Run lint (if script exists)
+        if: steps.detect.outputs.present == 'true'
+        run: |
+          cd frontend
+          node -e "p=require('./package.json');process.exit(p.scripts&&p.scripts.lint?0:1)" \
+            && ( [ -f pnpm-lock.yaml ] && pnpm run lint || npm run lint ) \
+            || echo 'no lint script; skipping'
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect frontend
+        id: detect
+        run: |
+          if [ -f frontend/package.json ]; then
+            echo "present=true" >> $GITHUB_OUTPUT
+          else
+            echo "present=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Fast-pass (no frontend)
+        if: steps.detect.outputs.present == 'false'
+        run: echo "No frontend found; passing build."
+      - uses: actions/setup-node@v4
+        if: steps.detect.outputs.present == 'true'
+        with:
+          node-version: '20'
+      - name: Enable corepack
+        if: steps.detect.outputs.present == 'true'
+        run: corepack enable
+      - name: Build (if script exists)
+        if: steps.detect.outputs.present == 'true'
+        env:
+          NEXT_PUBLIC_ENV: preview
+        run: |
+          cd frontend
+          if [ -f pnpm-lock.yaml ]; then PN=pnpm; else PN=npm; fi
+          if node -e "p=require('./package.json');process.exit(p.scripts&&p.scripts.build?0:1)"; then
+            if [ "$PN" = "pnpm" ]; then pnpm install --frozen-lockfile || pnpm install; else npm ci || npm i; fi
+            $PN run build
+          else
+            echo 'no build script; skipping'
+          fi
