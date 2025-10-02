@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+﻿<manifest xmlns:android="http://schemas.android.com/apk/res/android">
   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
   <uses-permission android:name="android.permission.INTERNET"/>
@@ -29,5 +29,12 @@
         <data android:scheme="domana"/>
       </intent-filter>
     </activity>
-  </application>
+          <meta-data android:name="expo.modules.updates.ENABLED" android:value="true" />
+        <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS" />
+        <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0" />
+        <meta-data android:name="expo.modules.updates.EXPO_UPDATE_URL" android:value="https://u.expo.dev/69982f4e-c195-48d6-923a-986f1b67cd1d" />
+        <meta-data android:name="expo.modules.updates.$11.0.0" />
+    </application>
 </manifest>
+
+

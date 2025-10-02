@@ -1,0 +1,8 @@
+﻿{ "expo": {
+  "owner": "domana",
+  "slug":  "domana",
+  "updates": { "url": "https://u.expo.dev/69982f4e-c195-48d6-923a-986f1b67cd1d" },
+  "android": { "runtimeVersion": "1.0.0" },
+  "ios":     { "runtimeVersion": "1.0.0" },
+  "extra": { "eas": { "projectId": "69982f4e-c195-48d6-923a-986f1b67cd1d" } }
+} }
