@@ -1,0 +1,94 @@
+﻿import { ConfigContext, ExpoConfig } from "expo/config";
+
+type Stage = "DEV" | "STAGING" | "PROD";
+const STAGE = (process.env.APP_STAGE as Stage) ?? "DEV";
+
+const NAME_BY_STAGE: Record<Stage, string> = {
+  DEV: "Domana Dev",
+  STAGING: "Domana Staging",
+  PROD: "Domana",
+};
+
+const SCHEME_BY_STAGE: Record<Stage, string> = {
+  DEV: "domana-dev",
+  STAGING: "domana-staging",
+  PROD: "domana",
+};
+
+const IOS_BUNDLE_BY_STAGE: Record<Stage, string> = {
+  DEV: "com.thebertusocompany.domana.dev",
+  STAGING: "com.thebertusocompany.domana.staging",
+  PROD: "com.thebertusocompany.domana",
+};
+
+const API_BASE_BY_STAGE: Record<Stage, string> = {
+  DEV: "http://localhost:3000",
+  STAGING: "https://staging-api.domana.app",
+  PROD: "https://api.domana.app",
+};
+
+// Default iOS build number per our policy (YYYYMMDD.N) - update via env in CI
+const TODAY_DEFAULT_BUILD = "20250927.1";
+
+export default ({ config }: ConfigContext): ExpoConfig => {
+  return {
+    name: NAME_BY_STAGE[STAGE],
+    slug: "domana",
+    owner: "domana",
+    description: "The flagship real estate platform by The Bertuso Company.",
+    version: "1.0.0",
+    scheme: SCHEME_BY_STAGE[STAGE],
+
+    // EAS Update (dynamic config needs explicit URL)
+    updates: {
+      url: "https://u.expo.dev/69982f4e-c195-48d6-923a-986f1b67cd1d",
+      enabled: true,
+      checkAutomatically: "ON_LOAD",
+      fallbackToCacheTimeout: 0,
+      // OTA code signing (public cert path provided via env/CI)
+      codeSigningCertificate: process.env.CODE_SIGN_CERT ?? undefined,
+      codeSigningMetadata: { keyid: "main", alg: "rsa-v1_5-sha256" },
+    },
+
+    android: {
+      package: "com.thebertusocompany.domana",
+      versionCode: Number(process.env.ANDROID_VERSION_CODE ?? 10000),
+      // Bare workflow requires platform-specific runtimeVersion (string)
+      runtimeVersion: "1.0.0",
+      intentFilters: [
+        {
+          action: "VIEW",
+          category: ["BROWSABLE", "DEFAULT"],
+          data: [{ scheme: "domana" }, { scheme: "domana-staging" }, { scheme: "domana-dev" }],
+        },
+      ],
+    },
+
+    ios: {
+      bundleIdentifier: IOS_BUNDLE_BY_STAGE[STAGE],
+      buildNumber: process.env.IOS_BUILD_NUMBER ?? TODAY_DEFAULT_BUILD,
+      // Bare workflow requires platform-specific runtimeVersion (string)
+      runtimeVersion: "1.0.0",
+    },
+
+    // Non-secret runtime constants
+    extra: {
+      stage: STAGE,
+      apiBaseUrl: API_BASE_BY_STAGE[STAGE],
+      featureToggles: { newExploreMap: false, betaChat: false },
+      build: {
+        commit: process.env.GIT_SHA ?? "unknown",
+        timestamp: new Date().toISOString(),
+      },
+      appInfo: { appName: "Domana", company: "The Bertuso Company" },
+      // Required for EAS dynamic config linkage
+      $169982f4e-c195-48d6-923a-986f1b67cd1d" },
+    },
+
+    // Placeholder assets
+    icon: "./assets/icon.png",
+    splash: { image: "./assets/splash.png", resizeMode: "contain", backgroundColor: "#ffffff" },
+  };
+};
+
+

@@ -96,6 +96,7 @@ packagingOptions {
     compileSdk rootProject.ext.compileSdkVersion
 
     namespace 'com.domana.app'
+    namespace "com.domana.app.staging"
     defaultConfig {
         applicationId 'com.domana.app'
         minSdkVersion rootProject.ext.minSdkVersion

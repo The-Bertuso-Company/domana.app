@@ -1,21 +1,48 @@
-{
-  "cli": {
-    "version": ">= 16.17.4",
-    "appVersionSource": "remote"
-  },
-  "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal"
-    },
-    "preview": {
-      "distribution": "internal"
-    },
-    "production": {
-      "autoIncrement": true
-    }
-  },
-  "submit": {
-    "production": {}
-  }
+﻿{
+    "cli":  {
+                "version":  ">=16.20.0",
+                appVersionSource: "remote"
+            },
+    "build":  {
+                  "dev":  {
+                              "developmentClient":  true,
+                              "channel":  "dev",
+                              "env":  {
+                                          "APP_STAGE":  "DEV"
+                                      },
+                              "autoIncrement":  true
+                          },
+                  "preview":  {
+                                  "channel":  "staging",
+                                  "env":  {
+                                              "APP_STAGE":  "STAGING"
+                                          },
+                                  "android":  {
+                                                  "buildType":  "apk"
+                                              },
+                                  "autoIncrement":  true
+                              },
+                  "production":  {
+                                     "channel":  "prod",
+                                     "env":  {
+                                                 "APP_STAGE":  "PROD"
+                                             },
+                                     "android":  {
+                                                     "buildType":  "app-bundle"
+                                                 },
+                                     "autoIncrement":  true
+                                 }
+              },
+    "submit":  {
+                   "preview":  {
+                                   "android":  {
+                                                   "track":  "internal"
+                                               }
+                               },
+                   "production":  {
+                                      "android":  {
+                                                      "track":  "production"
+                                                  }
+                                  }
+               }
 }
