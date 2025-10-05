@@ -43,3 +43,15 @@ keys/
 mobile/dist-dev/
 mobile/dist-prod/
 
+# Auto: ignore large artifacts
+_artifacts/
+_artifacts/**
+mobile/**/build/
+mobile/android/**/build/
+mobile/ios/**/build/
+*.apk
+*.aab
+*.ipa
+*.dSYM.zip
+*.tar.gz
+

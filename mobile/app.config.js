@@ -53,6 +53,7 @@ export default ({ config }) => {
 
     plugins: [
       "expo-router",
+      "expo-asset", // ✅ newly added
       [
         "expo-splash-screen",
         {
