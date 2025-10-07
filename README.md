@@ -12,9 +12,9 @@ Our mission is to make buying, selling, and exploring property easy, transparent
 ---
 
 ## 🎯 Target Users
-- Buyers
-- Sellers and agents
-- Renters
+- Buyers  
+- Sellers and agents  
+- Renters  
 - Overseas Filipinos (OFWs)
 
 ---
@@ -47,7 +47,23 @@ Our mission is to make buying, selling, and exploring property easy, transparent
 **Maps:** Mapbox  
 **Payments (future):** Xendit or PayMongo
 
-> Note: Keep stack minimal during MVP. Add tools only when the pain is real.
+> Keep the stack minimal during MVP. Add tools only when the pain is real.
+
+---
+
+## 🧭 Branch & Deployment Conventions
+
+| Branch Type | Environment | Domain | Notes |
+| --- | --- | --- | --- |
+| `main` | Production | https://domana.app | Public, indexed |
+| `staging` | Staging | https://staging.domana.app | Pre-release testing |
+| `feature/*`, `fix/*`, `phase/*` | Preview | Vercel preview URLs | Temporary dev branches |
+
+**Rules**
+- Only code merged into `main` goes live to production.  
+- `staging` is for integration and QA before release.  
+- All other branches automatically deploy as Vercel Previews.  
+- `main` and `staging` are protected; PR + review required.
 
 ---
 
@@ -59,118 +75,116 @@ Our mission is to make buying, selling, and exploring property easy, transparent
 - PostgreSQL 14+ (if running backend locally)
 
 ### Frontend (Next.js)
-```bash
+~~~bash
 # from repo root
 cd frontend
 pnpm install        # or: npm install
 cp .env.example .env.local  # fill values
 pnpm dev            # or: npm run dev
+~~~
 
-Common env keys (example):
-
+**Common env keys (example):**
+~~~ini
 NEXT_PUBLIC_APP_NAME=Domana
 NEXT_PUBLIC_MAPBOX_TOKEN=your_mapbox_public_token
 SENTRY_AUTH_TOKEN=your_sentry_token
 SENTRY_ORG=the-bertuso-company
 SENTRY_PROJECT=javascript-nextjs
+~~~
 
-Backend (Node + Express)
-
+### Backend (Node + Express)
+~~~bash
 # from repo root
 cd backend
 pnpm install
 cp .env.example .env        # fill values
 pnpm dev
+~~~
 
-Common env keys (example):
-
+**Common env keys (example):**
+~~~ini
 DATABASE_URL=postgres://user:pass@localhost:5432/domanadb
 JWT_SECRET=change_me
+~~~
 
-    If backend is not ready yet, stub API responses in the frontend using mock data or a simple /api route in Next.js.
-```
-🧪 Testing
+> If the backend isn’t ready yet, stub API responses in the frontend using mock data or a simple `/api` route in Next.js.
 
-    Unit tests: pnpm test
+---
 
-    Lint: pnpm lint
+## 🧪 Testing
+- **Unit tests:** `pnpm test`  
+- **Lint:** `pnpm lint`  
+- **Type check:** `pnpm typecheck`  
+Make these required checks on `main` when CI is set up.
 
-    Type check: pnpm typecheck
+---
 
-Add these as required checks on main when CI is set up.
-🚀 Deployments
+## 🚀 Deployments
 
-Frontend: Vercel
+**Frontend:** Vercel  
+- Add environment variables in **Vercel → Project Settings → Environment Variables**  
+- Map **Production** to `main`  
+- Map **Staging** to `staging` (staging subdomain)  
+- Previews are automatic for non-protected branches/PRs
 
-    Create VERCEL_PROJECT_ID and VERCEL_ORG_ID locally if using CLI
+**Backend:** TBD  
+- Options: Fly.io, Railway, Render, or AWS Lightsail  
+- Prefer managed Postgres for reliability
 
-    Add environment variables in Vercel Project Settings → Environment Variables
+---
 
-    Set Production to main branch
+## 🧯 Monitoring (Sentry)
+- Installed via Sentry Wizard for Next.js  
+- Confirm release tags in CI to track deploys  
+- Alerts for unhandled exceptions and API error rates
 
-Backend: TBD
+---
 
-    Options: Fly.io, Railway, Render, or AWS Lightsail
+## 🔐 Security & Privacy
+- Don’t commit secrets; use `.env*` and Vercel envs  
+- Rotate tokens on role change or contractor offboarding  
+- Sanitize PII in logs  
+- Enforce HTTPS everywhere in production
 
-    Use a managed Postgres if possible for reliability
+---
 
-🧯 Monitoring (Sentry)
-
-    Installed via Sentry Wizard for Next.js
-
-    Confirm release tags in CI to track deploys
-
-    Set alerts for unhandled exceptions and API error rates
-
-🔐 Security and Privacy
-
-    Do not commit secrets. Use .env* and Vercel project envs
-
-    Rotate tokens on role change or contractor access
-
-    Sanitize PII in logs
-
-    For production, enforce HTTPS everywhere
-
-🔁 Beta Program
-
+## 🔁 Beta Program
 Closed beta via:
+- TestFlight (iOS)  
+- Google Play Closed Testing (Android)
 
-    TestFlight (iOS)
-
-    Google Play Closed Testing (Android)
-
-Waitlist: coming soon
+Waitlist: coming soon  
 Feedback channel: GitHub Discussions or a Google Form
-🗺️ Roadmap (high level)
 
-    v0.1: Search, details, contact
+---
 
-    v0.2: Saved searches, simple auth
+## 🗺️ Roadmap (high level)
+- **v0.1:** Search, details, contact  
+- **v0.2:** Saved searches, simple auth  
+- **v0.3:** Agent dashboard, basic listing management  
+- **v0.4:** Listing verification workflow  
+- **v0.5:** Payments readiness (escrow pathways research)
 
-    v0.3: Agent dashboard, basic listing management
+---
 
-    v0.4: Verification workflow for listings
+## 🤝 Contributing
+Domana is currently private during MVP.  
+If you want to help later, email **hello@bertuso.com** with your GitHub and what you’d like to work on.
 
-    v0.5: Payments readiness (escrow pathways research)
+---
 
-🤝 Contributing
+## 🧭 Repo Hygiene
+- Protect `main` and `staging`; require PRs  
+- Conventional commits: `feat:`, `fix:`, `docs:`, `chore:`  
+- Keep this README accurate; update on major changes
 
-Domana is currently private during MVP.
-If you want to help later, email hello@bertuso.com with your GitHub and what you’d like to work on.
-🧭 Repo Hygiene
+---
 
-    Protect main branch and require PRs
+## 📄 License
+All rights reserved © 2025 **The Bertuso Company**
 
-    Conventional commits for clarity: feat:, fix:, docs:, chore:
+---
 
-    Keep README accurate to reality. Update on every major change
-
-📄 License
-
-All rights reserved © 2025 The Bertuso Company
-🌐 Links
-
-    Company: https://bertuso.com
-
-    App: https://domana.app
+## 🌐 Links
+- Company: https://bertuso.com  
+- App: https://domana.app
