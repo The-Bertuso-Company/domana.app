@@ -1,57 +1,66 @@
-﻿# Dependencies
+﻿# ==========================
+# 🧱 Dependencies
+# ==========================
 node_modules/
+frontend/node_modules/
 
-# Environment variables (never commit secrets)
+# ==========================
+# 🔐 Environment variables (never commit secrets)
+# ==========================
 .env
 .env.*
-!.env.example  # keep a template for local dev
+!.env.template   # keep the safe example template
 
-# OS / editor junk
+# ==========================
+# 💻 OS / Editor junk
+# ==========================
 .DS_Store
 Thumbs.db
+.vscode/
+*.swp
 
-# Build outputs
+# ==========================
+# ⚙️ Build outputs
+# ==========================
 dist/
 .next/
-out/            # Next.js static export (if used)
-coverage/       # test coverage
+frontend/.next/
+out/              # Next.js static export (if used)
+coverage/         # test coverage
+mobile/**/build/
+mobile/android/**/build/
+mobile/ios/**/build/
 
-# Logs
+# ==========================
+# 📦 Logs
+# ==========================
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Vercel deployment
+# ==========================
+# ☁️ Vercel deployment
+# ==========================
 .vercel/
 
-# Local tooling / IDE
-.vscode/
-*.swp
-# build + deps
-.next/
-frontend/.next/
-node_modules/
-frontend/node_modules/
-
-# backups & archives
+# ==========================
+# 🧰 Backups & archives
+# ==========================
 backups/
 frontend/backups/
+_artifacts/
+_artifacts/**
 *.zip
+*.tar.gz
+*.aab
+*.apk
+*.ipa
+*.dSYM.zip
 
+# ==========================
+# 🔑 Sensitive folders
+# ==========================
 keys/
 mobile/dist-dev/
 mobile/dist-prod/
-
-# Auto: ignore large artifacts
-_artifacts/
-_artifacts/**
-mobile/**/build/
-mobile/android/**/build/
-mobile/ios/**/build/
-*.apk
-*.aab
-*.ipa
-*.dSYM.zip
-*.tar.gz
-
